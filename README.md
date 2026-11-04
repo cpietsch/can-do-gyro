@@ -6,6 +6,11 @@ orientation in 3D, and over CAN it drives a BLDC motor that turns the base again
 the bottom, the top keeps facing the same direction in the room. It works standing upright, tilted, sideways and
 upside down.
 
+<p align="center">
+  <img src="docs/photo.jpg" alt="The unit: RollerCAN at the bottom, battery and XIAO STM32C5 taped on top" width="360">
+  <img src="docs/exploded.svg" alt="Exploded sketch: XIAO STM32C5, battery, RollerCAN body, rotor, and the wiring" width="460">
+</p>
+
 An M5Stack [Unit RollerCAN](https://docs.m5stack.com/en/unit/Unit_RollerCAN) stands on its motor: the round rotor is
 the bottom, on the table. On its body sit a small 2S LiHV battery and the XIAO. The XIAO is on the part that has to stay
 still, so it measures its own correction: a closed loop on the gyro, running at about 1 kHz.

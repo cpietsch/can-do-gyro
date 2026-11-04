@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 920" width="960" height="920" font-family="Helvetica, Arial, sans-serif">
+<defs>
+<marker id="arrowBlue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2e86de"/></marker>
+<marker id="arrowOrange" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#e67e22"/></marker>
+</defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="24" y="40" font-size="22" font-weight="bold" fill="#222">can-do-gyro, exploded</text>
+<text x="24" y="62" font-size="13" fill="#666">top (body + battery + XIAO) holds its direction, the bottom turns</text>
+<line x1="290.0" y1="122.0" x2="290.0" y2="810.0" stroke="#999" stroke-width="1.2" stroke-dasharray="8 5 2 5"/>
+<text x="296.0" y="126.0" font-size="12" font-weight="normal" text-anchor="start" fill="#888">motor axis</text>
+<path d="M192.0,734.0 L192.0,770.0 A98.0,56.6 0 0 0 388.0,770.0 L388.0,734.0 A98.0,56.6 0 0 1 192.0,734.0 Z" fill="#2e2e2e" stroke="#222" stroke-width="1.6"/>
+<ellipse cx="290.0" cy="734.0" rx="98.0" ry="56.6" fill="#4a4a4a" stroke="#222" stroke-width="1.6"/>
+<rect x="298.9" y="816.0" width="10" height="7" rx="2" fill="#c0392b" stroke="#222" stroke-width="1"/>
+<rect x="205.3" y="798.0" width="10" height="7" rx="2" fill="#c0392b" stroke="#222" stroke-width="1"/>
+<rect x="364.7" y="790.0" width="10" height="7" rx="2" fill="#c0392b" stroke="#222" stroke-width="1"/>
+<path d="M192.0,590.0 L192.0,638.0 A98.0,56.6 0 0 0 388.0,638.0 L388.0,590.0 A98.0,56.6 0 0 1 192.0,590.0 Z" fill="#2b2b2b" stroke="#222" stroke-width="1.6"/>
+<ellipse cx="290.0" cy="590.0" rx="98.0" ry="56.6" fill="#3a3a3a" stroke="#222" stroke-width="1.6"/>
+<polygon points="435.5,590.0 290.0,674.0 290.0,614.0 435.5,530.0" fill="#333" stroke="#222" stroke-width="1.6" stroke-linejoin="round" />
+<polygon points="144.5,590.0 290.0,674.0 290.0,614.0 144.5,530.0" fill="#222" stroke="#222" stroke-width="1.6" stroke-linejoin="round" />
+<polygon points="290.0,446.0 435.5,530.0 290.0,614.0 144.5,530.0" fill="#555" stroke="#222" stroke-width="1.6" stroke-linejoin="round" />
+<polygon points="290.0,482.0 373.1,530.0 290.0,578.0 206.9,530.0" fill="#1d3b57" stroke="#222" stroke-width="1.2" stroke-linejoin="round" />
+<rect x="235.0" y="621.0" width="20" height="11" fill="#eee" stroke="#222" stroke-width="1.2" transform="skewY(30 245.0 628.0)"/>
+<rect x="358.7" y="601.0" width="22" height="12" rx="2" fill="#e8b400" stroke="#222" stroke-width="1.2" transform="skewY(-30 369.7 608.0)"/>
+<polygon points="451.1,425.0 343.7,487.0 343.7,431.0 451.1,369.0" fill="#3d454e" stroke="#222" stroke-width="1.6" stroke-linejoin="round" />
+<polygon points="128.9,363.0 343.7,487.0 343.7,431.0 128.9,307.0" fill="#2f363d" stroke="#222" stroke-width="1.6" stroke-linejoin="round" />
+<polygon points="236.3,245.0 451.1,369.0 343.7,431.0 128.9,307.0" fill="#5a6470" stroke="#222" stroke-width="1.6" stroke-linejoin="round" />
+<polygon points="250.2,421.0 319.4,461.0 319.4,429.0 250.2,389.0" fill="#f4f4f4" stroke="#222" stroke-width="1" stroke-linejoin="round" />
+<text x="284.8" y="428.0" font-size="9" font-weight="normal" text-anchor="middle" fill="#222">2S LiHV</text>
+<polygon points="357.2,221.2 295.5,256.8 295.5,250.4 357.2,214.8" fill="#2a2a66" stroke="#222" stroke-width="1.6" stroke-linejoin="round" />
+<polygon points="222.8,214.8 295.5,256.8 295.5,250.4 222.8,208.4" fill="#20204f" stroke="#222" stroke-width="1.6" stroke-linejoin="round" />
+<polygon points="284.5,172.8 357.2,214.8 295.5,250.4 222.8,208.4" fill="#3b3b8f" stroke="#222" stroke-width="1.6" stroke-linejoin="round" />
+<polygon points="315.1,211.1 289.1,226.1 289.1,213.3 315.1,198.3" fill="#a8a8a8" stroke="#222" stroke-width="1.6" stroke-linejoin="round" />
+<polygon points="258.0,208.1 289.1,226.1 289.1,213.3 258.0,195.3" fill="#8e8e8e" stroke="#222" stroke-width="1.6" stroke-linejoin="round" />
+<polygon points="283.9,180.3 315.1,198.3 289.1,213.3 258.0,195.3" fill="#cfcfcf" stroke="#222" stroke-width="1.6" stroke-linejoin="round" />
+<polygon points="279.6,187.6 248.4,205.6 248.4,192.8 279.6,174.8" fill="#b0b0b0" stroke="#222" stroke-width="1.6" stroke-linejoin="round" />
+<polygon points="224.2,191.6 248.4,205.6 248.4,192.8 224.2,178.8" fill="#999" stroke="#222" stroke-width="1.6" stroke-linejoin="round" />
+<polygon points="255.4,160.8 279.6,174.8 248.4,192.8 224.2,178.8" fill="#d9d9d9" stroke="#222" stroke-width="1.6" stroke-linejoin="round" />
+<line x1="303.9" y1="202.0" x2="387.0" y2="250.0" stroke="#2e86de" stroke-width="3" marker-end="url(#arrowBlue)"/>
+<text x="393.0" y="264.0" font-size="12" font-weight="normal" text-anchor="start" fill="#2e86de">front: keeps facing</text>
+<text x="393.0" y="278.0" font-size="12" font-weight="normal" text-anchor="start" fill="#2e86de">one direction</text>
+<path d="M305.6,247.8 C395.6,277.8 439.7,548.0 377.7,606.0" fill="none" stroke="#16a085" stroke-width="2.6" stroke-linecap="round" />
+<path d="M305.6,250.8 C385.6,292.8 429.7,568.0 373.7,611.0" fill="none" stroke="#999" stroke-linecap="round" stroke-width="4.4"/>
+<path d="M305.6,250.8 C385.6,292.8 429.7,568.0 373.7,611.0" fill="none" stroke="#f7f7f7" stroke-width="2.6" stroke-linecap="round" />
+<path d="M238.4,220.6 C128.4,260.6 155.0,558.0 239.0,627.0" fill="none" stroke="#d63031" stroke-width="2.6" stroke-linecap="round" />
+<path d="M241.4,223.6 C138.4,270.6 165.0,568.0 247.0,630.0" fill="none" stroke="#222" stroke-width="2.6" stroke-linecap="round" />
+<path d="M376.6,440.0 C426.6,450.0 419.7,583.0 379.7,610.0" fill="none" stroke="#c0392b" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="6 4"/>
+<path d="M402.7,776.1 A120.0,70.6 0 0 1 177.3,776.1" fill="none" stroke="#e67e22" stroke-width="3" marker-end="url(#arrowOrange)"/>
+<text x="290.0" y="848.6" font-size="13" font-weight="normal" text-anchor="middle" fill="#e67e22">the bottom turns (by hand, or the motor against the top)</text>
+<polyline points="321.2,193.6 552.0,160.0 558.0,160.0" fill="none" stroke="#888" stroke-width="1"/>
+<circle cx="321.2" cy="193.6" r="2.5" fill="#888"/>
+<text x="560.0" y="165.0" font-size="15" font-weight="bold" text-anchor="start" fill="#222">XIAO STM32C5</text>
+<text x="560.0" y="183.0" font-size="13" font-weight="normal" text-anchor="start" fill="#555">on-board IMU (LSM6DS3TR-C) tracks the</text>
+<text x="560.0" y="200.0" font-size="13" font-weight="normal" text-anchor="start" fill="#555">top's 3D orientation; CAN via the</text>
+<text x="560.0" y="217.0" font-size="13" font-weight="normal" text-anchor="start" fill="#555">on-board TCAN3403; taped on the battery</text>
+<polyline points="451.1,385.0 552.0,365.0 558.0,365.0" fill="none" stroke="#888" stroke-width="1"/>
+<circle cx="451.1" cy="385.0" r="2.5" fill="#888"/>
+<text x="560.0" y="370.0" font-size="15" font-weight="bold" text-anchor="start" fill="#222">2S LiHV battery</text>
+<text x="560.0" y="388.0" font-size="13" font-weight="normal" text-anchor="start" fill="#555">580 mAh, 7.6 V, on the XT30;</text>
+<text x="560.0" y="405.0" font-size="13" font-weight="normal" text-anchor="start" fill="#555">lies flat on the RollerCAN's body</text>
+<polyline points="435.5,542.0 552.0,532.0 558.0,532.0" fill="none" stroke="#888" stroke-width="1"/>
+<circle cx="435.5" cy="542.0" r="2.5" fill="#888"/>
+<text x="560.0" y="537.0" font-size="15" font-weight="bold" text-anchor="start" fill="#222">Unit RollerCAN body</text>
+<text x="560.0" y="555.0" font-size="13" font-weight="normal" text-anchor="start" fill="#555">motor stator, FOC driver, encoder, screen;</text>
+<text x="560.0" y="572.0" font-size="13" font-weight="normal" text-anchor="start" fill="#555">XT30 (2+2): power + CAN_H/CAN_L,</text>
+<text x="560.0" y="589.0" font-size="13" font-weight="normal" text-anchor="start" fill="#555">Grove: 5 V for the XIAO</text>
+<polyline points="393.9,774.0 552.0,764.0 558.0,764.0" fill="none" stroke="#888" stroke-width="1"/>
+<circle cx="393.9" cy="774.0" r="2.5" fill="#888"/>
+<text x="560.0" y="769.0" font-size="15" font-weight="bold" text-anchor="start" fill="#222">Rotor = the bottom</text>
+<text x="560.0" y="787.0" font-size="13" font-weight="normal" text-anchor="start" fill="#555">motor rotor (D3504 BLDC), stands on the</text>
+<text x="560.0" y="804.0" font-size="13" font-weight="normal" text-anchor="start" fill="#555">table on rubber feet</text>
+<line x1="560" y1="830" x2="586" y2="830" stroke="#16a085" stroke-width="2.6" />
+<text x="594.0" y="834.0" font-size="12" font-weight="normal" text-anchor="start" fill="#555">CAN_H / CAN_L (+ GND): XIAO pads to XT30</text>
+<line x1="560" y1="850" x2="586" y2="850" stroke="#d63031" stroke-width="2.6" />
+<text x="594.0" y="854.0" font-size="12" font-weight="normal" text-anchor="start" fill="#555">5 V / GND: Grove port to XIAO 5V</text>
+<line x1="560" y1="870" x2="586" y2="870" stroke="#c0392b" stroke-width="2.6" stroke-dasharray="6 4"/>
+<text x="594.0" y="874.0" font-size="12" font-weight="normal" text-anchor="start" fill="#555">battery to XT30 power</text>
+</svg>
