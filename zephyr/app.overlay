@@ -1,0 +1,4 @@
+/* The on-board IMU's I2C bus at 400 kHz: one loop's IMU reads take ~0.3 ms */
+&i2c2 {
+	clock-frequency = <I2C_BITRATE_FAST>;
+};
