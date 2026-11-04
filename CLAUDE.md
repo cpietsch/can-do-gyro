@@ -4,6 +4,7 @@ Firmware for a self-righting platform: a Seeed XIAO STM32C5 tracks the top's 3D 
 drives an M5Stack Unit RollerCAN over CAN, which turns the bottom so the top keeps facing one direction. One PlatformIO
 project (env `xiao`, Zephyr 4.4, Seeed's platform pinned in platformio.ini), all firmware in `src/main.c`.
 README.md has the wiring, behavior, commands, settings and lessons learned: keep it updated with every change.
+docs/hackster.md (the Hackster.io write-up) repeats much of it: keep the facts in sync.
 
 ## Hardware facts
 

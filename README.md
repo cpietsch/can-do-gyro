@@ -15,6 +15,22 @@ An M5Stack [Unit RollerCAN](https://docs.m5stack.com/en/unit/Unit_RollerCAN) sta
 the bottom, on the table. On its body sit a small 2S LiHV battery and the XIAO. The XIAO is on the part that has to stay
 still, so it measures its own correction: a closed loop on the gyro, running at about 1 kHz.
 
+## How it came about
+
+I was looking for something to build with the XIAO STM32C5 and noticed two things on the board: an IMU
+(accelerometer and gyro), and CAN with the transceiver on board, its killer feature. What can you do with knowing your
+orientation and being able to talk to a motor? I had always wanted to try a BLDC motor, so: a gimbal in one axis. The
+XIAO rides on the motor, and however you turn it, the top keeps facing the same direction.
+
+The motor was an easy pick: the RollerCAN is a complete BLDC unit (motor, FOC driver, encoder) that takes its commands
+over CAN. I soldered DuPont pigtails to the XIAO's CAN pads and to 5V and GND and glued them down, so everything plugs
+in and out. The RollerCAN ran from a bench supply at first, then from a LiPo plugged straight into it, and the unit
+became standalone. After some tuning it held the way I had in mind, and with orientation tracking in 3D it no longer
+matters how the motor and the XIAO are oriented.
+
+It shows how the XIAO STM32C5 can drive a CAN motor with everything, from the sensor fusion to the control loop,
+computed on the chip.
+
 ## Why the XIAO STM32C5
 
 Everything this needs is on the thumb-sized board, so the whole controller is the XIAO plus four wires:
@@ -35,6 +51,8 @@ Everything this needs is on the thumb-sized board, so the whole controller is th
 - M5Stack Unit RollerCAN (STM32G431 + DRV8311 FOC driver, D3504 200 KV gimbal motor, magnetic encoder, 6–16 V on
   XT30)
 - A 2S LiHV battery (580 mAh used here, 7.6 V nominal) with an XT30 plug
+- Female DuPont pigtails, soldered to the XIAO's CANH/CANL pads and 5V/GND and glued down on top with superglue, so
+  CAN and power plug in and out
 - Something to hold battery and XIAO on the RollerCAN's body (tape works)
 
 Wiring:
@@ -195,6 +213,15 @@ Things learned along the way, in case they save you time:
   minute.
 - **Loops faster than 1 ms** (shorter `LOOP_US`) made the tilt estimate go wrong and the motor run off. Not
   understood yet.
+
+## What else it could be
+
+Anything that has to keep pointing one way on something that turns:
+
+- **Hubcaps that stand still** while the car drives. On a wheel the motor axis lies flat, where the accelerometer sees
+  the angle too, so it wouldn't drift. The motor would have to keep up with the wheel, though: about 14 turns per
+  second at 100 km/h.
+- **A Predator costume**: a shoulder cannon that stays aimed while you turn and walk, with a laser pointer on it.
 
 ## License
 
