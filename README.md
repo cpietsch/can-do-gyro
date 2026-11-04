@@ -1,8 +1,7 @@
-# can-do-gyro
+# can-do-gyro: A One-Axis Gimbal with the XIAO STM32C5 and a CAN Motor
 
-A self-righting platform built with the Seeed Studio
-[XIAO STM32C5](https://wiki.seeedstudio.com/xiao_stm32c5_getting_started/): its on-board IMU tracks the platform's
-orientation in 3D, and over CAN it drives a BLDC motor that turns the base against every disturbance. However you turn
+The Seeed Studio [XIAO STM32C5](https://wiki.seeedstudio.com/xiao_stm32c5_getting_started/)'s on-board IMU tracks the
+top's orientation in 3D, and over CAN it drives a BLDC motor that turns the base against every disturbance. However you turn
 the bottom, the top keeps facing the same direction in the room. It works standing upright, tilted, sideways and
 upside down.
 

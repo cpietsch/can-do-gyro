@@ -1,4 +1,4 @@
-// can-do-gyro: a self-righting platform with the Seeed XIAO STM32C5.
+// can-do-gyro: a one-axis gimbal with the Seeed XIAO STM32C5 and a CAN motor.
 //
 // An M5Stack Unit RollerCAN (BLDC motor with its own FOC driver) stands on its motor. Its body, a battery and the XIAO
 // sit on top. However the bottom is turned, the top keeps facing the same direction in the room: the XIAO tracks the
