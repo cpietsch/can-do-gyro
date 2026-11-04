@@ -56,10 +56,6 @@ Everything this needs is on the thumb-sized board, so the whole controller is th
 
 Wiring:
 
-<p align="center">
-  <img src="docs/exploded.svg" alt="Exploded sketch, to scale: the XIAO STM32C5 with its two DuPont sockets, the LiPo, the RollerCAN, and the wiring between them" width="820">
-</p>
-
 The RollerCAN's XT30 (2+2) connector carries both power and CAN:
 
 - Battery on its power pins.
