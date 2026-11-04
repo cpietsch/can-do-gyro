@@ -1,77 +1,202 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 920" width="960" height="920" font-family="Helvetica, Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1110 940" width="1110" height="940" font-family="Helvetica, Arial, sans-serif">
 <defs>
 <marker id="arrowBlue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2e86de"/></marker>
 <marker id="arrowOrange" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#e67e22"/></marker>
 </defs>
 <rect width="100%" height="100%" fill="#ffffff"/>
 <text x="24" y="40" font-size="22" font-weight="bold" fill="#222">can-do-gyro, exploded</text>
-<text x="24" y="62" font-size="13" fill="#666">top (body + battery + XIAO) holds its direction, the bottom turns</text>
-<line x1="290.0" y1="122.0" x2="290.0" y2="810.0" stroke="#999" stroke-width="1.2" stroke-dasharray="8 5 2 5"/>
-<text x="296.0" y="126.0" font-size="12" font-weight="normal" text-anchor="start" fill="#888">motor axis</text>
-<path d="M192.0,734.0 L192.0,770.0 A98.0,56.6 0 0 0 388.0,770.0 L388.0,734.0 A98.0,56.6 0 0 1 192.0,734.0 Z" fill="#2e2e2e" stroke="#222" stroke-width="1.6"/>
-<ellipse cx="290.0" cy="734.0" rx="98.0" ry="56.6" fill="#4a4a4a" stroke="#222" stroke-width="1.6"/>
-<rect x="298.9" y="816.0" width="10" height="7" rx="2" fill="#c0392b" stroke="#222" stroke-width="1"/>
-<rect x="205.3" y="798.0" width="10" height="7" rx="2" fill="#c0392b" stroke="#222" stroke-width="1"/>
-<rect x="364.7" y="790.0" width="10" height="7" rx="2" fill="#c0392b" stroke="#222" stroke-width="1"/>
-<path d="M192.0,590.0 L192.0,638.0 A98.0,56.6 0 0 0 388.0,638.0 L388.0,590.0 A98.0,56.6 0 0 1 192.0,590.0 Z" fill="#2b2b2b" stroke="#222" stroke-width="1.6"/>
-<ellipse cx="290.0" cy="590.0" rx="98.0" ry="56.6" fill="#3a3a3a" stroke="#222" stroke-width="1.6"/>
-<polygon points="435.5,590.0 290.0,674.0 290.0,614.0 435.5,530.0" fill="#333" stroke="#222" stroke-width="1.6" stroke-linejoin="round" />
-<polygon points="144.5,590.0 290.0,674.0 290.0,614.0 144.5,530.0" fill="#222" stroke="#222" stroke-width="1.6" stroke-linejoin="round" />
-<polygon points="290.0,446.0 435.5,530.0 290.0,614.0 144.5,530.0" fill="#555" stroke="#222" stroke-width="1.6" stroke-linejoin="round" />
-<polygon points="290.0,482.0 373.1,530.0 290.0,578.0 206.9,530.0" fill="#1d3b57" stroke="#222" stroke-width="1.2" stroke-linejoin="round" />
-<rect x="235.0" y="621.0" width="20" height="11" fill="#eee" stroke="#222" stroke-width="1.2" transform="skewY(30 245.0 628.0)"/>
-<rect x="358.7" y="601.0" width="22" height="12" rx="2" fill="#e8b400" stroke="#222" stroke-width="1.2" transform="skewY(-30 369.7 608.0)"/>
-<polygon points="451.1,425.0 343.7,487.0 343.7,431.0 451.1,369.0" fill="#3d454e" stroke="#222" stroke-width="1.6" stroke-linejoin="round" />
-<polygon points="128.9,363.0 343.7,487.0 343.7,431.0 128.9,307.0" fill="#2f363d" stroke="#222" stroke-width="1.6" stroke-linejoin="round" />
-<polygon points="236.3,245.0 451.1,369.0 343.7,431.0 128.9,307.0" fill="#5a6470" stroke="#222" stroke-width="1.6" stroke-linejoin="round" />
-<polygon points="250.2,421.0 319.4,461.0 319.4,429.0 250.2,389.0" fill="#f4f4f4" stroke="#222" stroke-width="1" stroke-linejoin="round" />
-<text x="284.8" y="428.0" font-size="9" font-weight="normal" text-anchor="middle" fill="#222">2S LiHV</text>
-<polygon points="357.2,221.2 295.5,256.8 295.5,250.4 357.2,214.8" fill="#2a2a66" stroke="#222" stroke-width="1.6" stroke-linejoin="round" />
-<polygon points="222.8,214.8 295.5,256.8 295.5,250.4 222.8,208.4" fill="#20204f" stroke="#222" stroke-width="1.6" stroke-linejoin="round" />
-<polygon points="284.5,172.8 357.2,214.8 295.5,250.4 222.8,208.4" fill="#3b3b8f" stroke="#222" stroke-width="1.6" stroke-linejoin="round" />
-<polygon points="315.1,211.1 289.1,226.1 289.1,213.3 315.1,198.3" fill="#a8a8a8" stroke="#222" stroke-width="1.6" stroke-linejoin="round" />
-<polygon points="258.0,208.1 289.1,226.1 289.1,213.3 258.0,195.3" fill="#8e8e8e" stroke="#222" stroke-width="1.6" stroke-linejoin="round" />
-<polygon points="283.9,180.3 315.1,198.3 289.1,213.3 258.0,195.3" fill="#cfcfcf" stroke="#222" stroke-width="1.6" stroke-linejoin="round" />
-<polygon points="279.6,187.6 248.4,205.6 248.4,192.8 279.6,174.8" fill="#b0b0b0" stroke="#222" stroke-width="1.6" stroke-linejoin="round" />
-<polygon points="224.2,191.6 248.4,205.6 248.4,192.8 224.2,178.8" fill="#999" stroke="#222" stroke-width="1.6" stroke-linejoin="round" />
-<polygon points="255.4,160.8 279.6,174.8 248.4,192.8 224.2,178.8" fill="#d9d9d9" stroke="#222" stroke-width="1.6" stroke-linejoin="round" />
-<line x1="303.9" y1="202.0" x2="387.0" y2="250.0" stroke="#2e86de" stroke-width="3" marker-end="url(#arrowBlue)"/>
-<text x="393.0" y="264.0" font-size="12" font-weight="normal" text-anchor="start" fill="#2e86de">front: keeps facing</text>
-<text x="393.0" y="278.0" font-size="12" font-weight="normal" text-anchor="start" fill="#2e86de">one direction</text>
-<path d="M305.6,247.8 C395.6,277.8 439.7,548.0 377.7,606.0" fill="none" stroke="#16a085" stroke-width="2.6" stroke-linecap="round" />
-<path d="M305.6,250.8 C385.6,292.8 429.7,568.0 373.7,611.0" fill="none" stroke="#999" stroke-linecap="round" stroke-width="4.4"/>
-<path d="M305.6,250.8 C385.6,292.8 429.7,568.0 373.7,611.0" fill="none" stroke="#f7f7f7" stroke-width="2.6" stroke-linecap="round" />
-<path d="M238.4,220.6 C128.4,260.6 155.0,558.0 239.0,627.0" fill="none" stroke="#d63031" stroke-width="2.6" stroke-linecap="round" />
-<path d="M241.4,223.6 C138.4,270.6 165.0,568.0 247.0,630.0" fill="none" stroke="#222" stroke-width="2.6" stroke-linecap="round" />
-<path d="M376.6,440.0 C426.6,450.0 419.7,583.0 379.7,610.0" fill="none" stroke="#c0392b" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="6 4"/>
-<path d="M402.7,776.1 A120.0,70.6 0 0 1 177.3,776.1" fill="none" stroke="#e67e22" stroke-width="3" marker-end="url(#arrowOrange)"/>
-<text x="290.0" y="848.6" font-size="13" font-weight="normal" text-anchor="middle" fill="#e67e22">the bottom turns (by hand, or the motor against the top)</text>
-<polyline points="321.2,193.6 552.0,160.0 558.0,160.0" fill="none" stroke="#888" stroke-width="1"/>
-<circle cx="321.2" cy="193.6" r="2.5" fill="#888"/>
-<text x="560.0" y="165.0" font-size="15" font-weight="bold" text-anchor="start" fill="#222">XIAO STM32C5</text>
-<text x="560.0" y="183.0" font-size="13" font-weight="normal" text-anchor="start" fill="#555">on-board IMU (LSM6DS3TR-C) tracks the</text>
-<text x="560.0" y="200.0" font-size="13" font-weight="normal" text-anchor="start" fill="#555">top's 3D orientation; CAN via the</text>
-<text x="560.0" y="217.0" font-size="13" font-weight="normal" text-anchor="start" fill="#555">on-board TCAN3403; taped on the battery</text>
-<polyline points="451.1,385.0 552.0,365.0 558.0,365.0" fill="none" stroke="#888" stroke-width="1"/>
-<circle cx="451.1" cy="385.0" r="2.5" fill="#888"/>
-<text x="560.0" y="370.0" font-size="15" font-weight="bold" text-anchor="start" fill="#222">2S LiHV battery</text>
-<text x="560.0" y="388.0" font-size="13" font-weight="normal" text-anchor="start" fill="#555">580 mAh, 7.6 V, on the XT30;</text>
-<text x="560.0" y="405.0" font-size="13" font-weight="normal" text-anchor="start" fill="#555">lies flat on the RollerCAN's body</text>
-<polyline points="435.5,542.0 552.0,532.0 558.0,532.0" fill="none" stroke="#888" stroke-width="1"/>
-<circle cx="435.5" cy="542.0" r="2.5" fill="#888"/>
-<text x="560.0" y="537.0" font-size="15" font-weight="bold" text-anchor="start" fill="#222">Unit RollerCAN body</text>
-<text x="560.0" y="555.0" font-size="13" font-weight="normal" text-anchor="start" fill="#555">motor stator, FOC driver, encoder, screen;</text>
-<text x="560.0" y="572.0" font-size="13" font-weight="normal" text-anchor="start" fill="#555">XT30 (2+2): power + CAN_H/CAN_L,</text>
-<text x="560.0" y="589.0" font-size="13" font-weight="normal" text-anchor="start" fill="#555">Grove: 5 V for the XIAO</text>
-<polyline points="393.9,774.0 552.0,764.0 558.0,764.0" fill="none" stroke="#888" stroke-width="1"/>
-<circle cx="393.9" cy="774.0" r="2.5" fill="#888"/>
-<text x="560.0" y="769.0" font-size="15" font-weight="bold" text-anchor="start" fill="#222">Rotor = the bottom</text>
-<text x="560.0" y="787.0" font-size="13" font-weight="normal" text-anchor="start" fill="#555">motor rotor (D3504 BLDC), stands on the</text>
-<text x="560.0" y="804.0" font-size="13" font-weight="normal" text-anchor="start" fill="#555">table on rubber feet</text>
-<line x1="560" y1="830" x2="586" y2="830" stroke="#16a085" stroke-width="2.6" />
-<text x="594.0" y="834.0" font-size="12" font-weight="normal" text-anchor="start" fill="#555">CAN_H / CAN_L (+ GND): XIAO pads to XT30</text>
-<line x1="560" y1="850" x2="586" y2="850" stroke="#d63031" stroke-width="2.6" />
-<text x="594.0" y="854.0" font-size="12" font-weight="normal" text-anchor="start" fill="#555">5 V / GND: Grove port to XIAO 5V</text>
-<line x1="560" y1="870" x2="586" y2="870" stroke="#c0392b" stroke-width="2.6" stroke-dasharray="6 4"/>
-<text x="594.0" y="874.0" font-size="12" font-weight="normal" text-anchor="start" fill="#555">battery to XT30 power</text>
+<text x="24" y="62" font-size="13" fill="#666">to scale; the top (housing, LiPo, XIAO) holds its direction, the bottom turns</text>
+<line x1="500.0" y1="282.5" x2="500.0" y2="870.0" stroke="#aaa" stroke-width="1.2" stroke-dasharray="8 5 2 5"/>
+<text x="506.0" y="286.5" font-size="12" font-weight="normal" text-anchor="start" fill="#999">motor axis</text>
+<path d="M377.5,790.0 L377.5,830.0 A122.5,70.7 0 0 0 622.5,830.0 L622.5,790.0 A122.5,70.7 0 0 1 377.5,790.0 Z" fill="#3b3b3b" stroke="#1a1a1a" stroke-width="1.3"/>
+<path d="M374.5,725.0 L374.5,790.0 A125.5,72.5 0 0 0 625.5,790.0 L625.5,725.0 A125.5,72.5 0 0 1 374.5,725.0 Z" fill="#303030" stroke="#1a1a1a" stroke-width="1.3"/>
+<path d="M380.6,690.0 L380.6,725.0 A119.4,68.9 0 0 0 619.4,725.0 L619.4,690.0 A119.4,68.9 0 0 1 380.6,690.0 Z" fill="#262626" stroke="#1a1a1a" stroke-width="1.3"/>
+<polygon points="487.6,894.3 440.8,886.0 440.8,861.0 487.6,869.3" fill="#c0392b" stroke="#1a1a1a" stroke-width="1" stroke-linejoin="round"/>
+<polygon points="673.2,690.0 500.0,790.0 500.0,730.0 673.2,630.0" fill="#363636" stroke="#1a1a1a" stroke-width="1.3" stroke-linejoin="round"/>
+<polygon points="326.8,690.0 500.0,790.0 500.0,730.0 326.8,630.0" fill="#2a2a2a" stroke="#1a1a1a" stroke-width="1.3" stroke-linejoin="round"/>
+<polygon points="500.0,530.0 673.2,630.0 500.0,730.0 326.8,630.0" fill="#4a4a4a" stroke="#1a1a1a" stroke-width="1.3" stroke-linejoin="round"/>
+<polygon points="504.3,592.5 565.0,627.5 504.3,662.5 443.7,627.5" fill="#14304a" stroke="#1a1a1a" stroke-width="1" stroke-linejoin="round"/>
+<ellipse cx="500.0" cy="550.0" rx="11.0" ry="6.4" fill="#9a9a9a" stroke="#1a1a1a" stroke-width="0.8"/>
+<ellipse cx="638.6" cy="630.0" rx="11.0" ry="6.4" fill="#9a9a9a" stroke="#1a1a1a" stroke-width="0.8"/>
+<ellipse cx="500.0" cy="710.0" rx="11.0" ry="6.4" fill="#9a9a9a" stroke="#1a1a1a" stroke-width="0.8"/>
+<ellipse cx="361.4" cy="630.0" rx="11.0" ry="6.4" fill="#9a9a9a" stroke="#1a1a1a" stroke-width="0.8"/>
+<polygon points="642.9,692.5 599.6,717.5 599.6,687.5 642.9,662.5" fill="#c0392b" stroke="#1a1a1a" stroke-width="1" stroke-linejoin="round"/>
+<polygon points="638.6,690.0 603.9,710.0 603.9,692.5 638.6,672.5" fill="#5a1a14" stroke="#1a1a1a" stroke-width="0.6" stroke-linejoin="round"/>
+<polygon points="409.1,727.5 452.4,752.5 452.4,712.5 409.1,687.5" fill="#111" stroke="#1a1a1a" stroke-width="1" stroke-linejoin="round"/>
+<polygon points="413.4,707.5 448.0,727.5 448.0,714.0 413.4,694.0" fill="#000" stroke="#1a1a1a" stroke-width="0.6" stroke-linejoin="round"/>
+<polygon points="413.4,726.0 448.0,746.0 448.0,732.5 413.4,712.5" fill="#000" stroke="#1a1a1a" stroke-width="0.6" stroke-linejoin="round"/>
+<polygon points="422.1,770.0 378.8,795.0 378.8,755.0 422.1,730.0" fill="#1f1f1f" stroke="#1a1a1a" stroke-width="1.3" stroke-linejoin="round"/>
+<polygon points="335.5,770.0 378.8,795.0 378.8,755.0 335.5,730.0" fill="#161616" stroke="#1a1a1a" stroke-width="1.3" stroke-linejoin="round"/>
+<polygon points="378.8,705.0 422.1,730.0 378.8,755.0 335.5,730.0" fill="#2c2c2c" stroke="#1a1a1a" stroke-width="1.3" stroke-linejoin="round"/>
+<line x1="428.6" y1="721.2" x2="402.6" y2="736.2" stroke="#888" stroke-width="1" stroke-dasharray="3 3"/>
+<polygon points="699.2,725.0 655.9,750.0 655.9,720.0 699.2,695.0" fill="#e2e2e2" stroke="#1a1a1a" stroke-width="1.3" stroke-linejoin="round"/>
+<polygon points="625.6,732.5 655.9,750.0 655.9,720.0 625.6,702.5" fill="#d4d4d4" stroke="#1a1a1a" stroke-width="1.3" stroke-linejoin="round"/>
+<polygon points="668.9,677.5 699.2,695.0 655.9,720.0 625.6,702.5" fill="#f6f6f6" stroke="#1a1a1a" stroke-width="1.3" stroke-linejoin="round"/>
+<line x1="623.4" y1="691.2" x2="645.1" y2="703.8" stroke="#888" stroke-width="1" stroke-dasharray="3 3"/>
+<polygon points="687.3,450.6 379.8,628.1 379.8,560.6 687.3,383.1" fill="#9aa2a9" stroke="#1a1a1a" stroke-width="1.3" stroke-linejoin="round"/>
+<polygon points="312.7,589.4 379.8,628.1 379.8,560.6 312.7,521.9" fill="#7e868d" stroke="#1a1a1a" stroke-width="1.3" stroke-linejoin="round"/>
+<polygon points="620.2,344.4 687.3,383.1 379.8,560.6 312.7,521.9" fill="#b9c0c6" stroke="#1a1a1a" stroke-width="1.3" stroke-linejoin="round"/>
+<polygon points="628.8,471.9 464.3,566.9 464.3,524.4 628.8,429.4" fill="#ffffff" stroke="#1a1a1a" stroke-width="0.8" stroke-linejoin="round"/>
+<text x="0.0" y="0.0" font-size="15" font-weight="bold" text-anchor="start" fill="#333" transform="matrix(0.8660,-0.5,0,1,477.3,546.9)">2S LiHV 580 mAh</text>
+<polygon points="326.8,582.5 365.8,605.0 365.8,570.0 326.8,547.5" fill="#222" stroke="#1a1a1a" stroke-width="0.8" stroke-linejoin="round"/>
+<path d="M551.5,350.0 C612.2,285.0 785.8,645.0 684.0,718.8" fill="none" stroke="#e8e8e8" stroke-width="4.0" stroke-linecap="round"/>
+<path d="M551.5,350.0 C612.2,285.0 785.8,645.0 684.0,718.8" fill="none" stroke="#d63031" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M560.2,355.0 C629.5,285.0 777.1,670.0 671.0,726.2" fill="none" stroke="#e8e8e8" stroke-width="4.0" stroke-linecap="round"/>
+<path d="M560.2,355.0 C629.5,285.0 777.1,670.0 671.0,726.2" fill="none" stroke="#222" stroke-width="2.4" stroke-linecap="round"/>
+<polygon points="584.0,358.5 493.1,411.0 493.1,405.0 584.0,352.5" fill="#151515" stroke="#1a1a1a" stroke-width="1.3" stroke-linejoin="round"/>
+<polygon points="416.0,366.5 493.1,411.0 493.1,405.0 416.0,360.5" fill="#101010" stroke="#1a1a1a" stroke-width="1.3" stroke-linejoin="round"/>
+<polygon points="506.9,308.0 584.0,352.5 493.1,405.0 416.0,360.5" fill="#2a2a2a" stroke="#1a1a1a" stroke-width="1.3" stroke-linejoin="round"/>
+<polygon points="569.4,354.5 575.0,357.7 568.1,361.7 562.4,358.5" fill="#d4a017" stroke="#1a1a1a" stroke-width="0.4" stroke-linejoin="round"/>
+<polygon points="497.9,313.2 503.6,316.5 496.6,320.5 491.0,317.2" fill="#d4a017" stroke="#1a1a1a" stroke-width="0.4" stroke-linejoin="round"/>
+<polygon points="558.4,360.8 564.0,364.0 557.1,368.0 551.4,364.8" fill="#d4a017" stroke="#1a1a1a" stroke-width="0.4" stroke-linejoin="round"/>
+<polygon points="486.9,319.5 492.6,322.8 485.6,326.8 480.0,323.5" fill="#d4a017" stroke="#1a1a1a" stroke-width="0.4" stroke-linejoin="round"/>
+<polygon points="547.4,367.1 553.0,370.4 546.1,374.4 540.4,371.1" fill="#d4a017" stroke="#1a1a1a" stroke-width="0.4" stroke-linejoin="round"/>
+<polygon points="475.9,325.9 481.6,329.1 474.6,333.1 469.0,329.9" fill="#d4a017" stroke="#1a1a1a" stroke-width="0.4" stroke-linejoin="round"/>
+<polygon points="536.4,373.5 542.0,376.8 535.1,380.8 529.4,377.5" fill="#d4a017" stroke="#1a1a1a" stroke-width="0.4" stroke-linejoin="round"/>
+<polygon points="464.9,332.2 470.6,335.5 463.6,339.5 458.0,336.2" fill="#d4a017" stroke="#1a1a1a" stroke-width="0.4" stroke-linejoin="round"/>
+<polygon points="525.4,379.9 531.0,383.1 524.1,387.1 518.4,383.9" fill="#d4a017" stroke="#1a1a1a" stroke-width="0.4" stroke-linejoin="round"/>
+<polygon points="453.9,338.6 459.6,341.9 452.6,345.9 447.0,342.6" fill="#d4a017" stroke="#1a1a1a" stroke-width="0.4" stroke-linejoin="round"/>
+<polygon points="514.4,386.2 520.0,389.5 513.1,393.5 507.4,390.2" fill="#d4a017" stroke="#1a1a1a" stroke-width="0.4" stroke-linejoin="round"/>
+<polygon points="442.9,345.0 448.6,348.2 441.6,352.2 436.0,349.0" fill="#d4a017" stroke="#1a1a1a" stroke-width="0.4" stroke-linejoin="round"/>
+<polygon points="503.4,392.5 509.0,395.8 502.1,399.8 496.4,396.5" fill="#d4a017" stroke="#1a1a1a" stroke-width="0.4" stroke-linejoin="round"/>
+<polygon points="431.9,351.3 437.6,354.5 430.6,358.5 425.0,355.3" fill="#d4a017" stroke="#1a1a1a" stroke-width="0.4" stroke-linejoin="round"/>
+<polygon points="554.1,345.2 500.0,376.5 500.0,372.5 554.1,341.2" fill="#cfcfcf" stroke="#1a1a1a" stroke-width="0.8" stroke-linejoin="round"/>
+<polygon points="465.4,356.5 500.0,376.5 500.0,372.5 465.4,352.5" fill="#bdbdbd" stroke="#1a1a1a" stroke-width="0.8" stroke-linejoin="round"/>
+<polygon points="519.5,321.2 554.1,341.2 500.0,372.5 465.4,352.5" fill="#eeeeee" stroke="#1a1a1a" stroke-width="0.8" stroke-linejoin="round"/>
+<path d="M487.4,318.0 C509.1,300.5 528.1,312.8 523.8,323.8" fill="none" stroke="#8a8a8a" stroke-width="3.4000000000000004" stroke-linecap="round"/>
+<path d="M487.4,318.0 C509.1,300.5 528.1,312.8 523.8,323.8" fill="none" stroke="#fafafa" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M496.1,323.0 C513.4,308.0 536.8,317.8 532.5,328.8" fill="none" stroke="#e8e8e8" stroke-width="3.2" stroke-linecap="round"/>
+<path d="M496.1,323.0 C513.4,308.0 536.8,317.8 532.5,328.8" fill="none" stroke="#16a085" stroke-width="1.6" stroke-linecap="round"/>
+<polygon points="502.6,333.0 442.0,368.0 442.0,355.5 502.6,320.5" fill="#1c1c1c" stroke="#1a1a1a" stroke-width="1" stroke-linejoin="round"/>
+<polygon points="420.3,355.5 442.0,368.0 442.0,355.5 420.3,343.0" fill="#141414" stroke="#1a1a1a" stroke-width="1" stroke-linejoin="round"/>
+<polygon points="480.9,308.0 502.6,320.5 442.0,355.5 420.3,343.0" fill="#2e2e2e" stroke="#1a1a1a" stroke-width="1" stroke-linejoin="round"/>
+<polygon points="423.8,354.5 429.0,357.5 429.0,351.0 423.8,348.0" fill="#000" stroke="#1a1a1a" stroke-width="0.4" stroke-linejoin="round"/>
+<polygon points="434.6,360.8 439.8,363.8 439.8,357.2 434.6,354.2" fill="#000" stroke="#1a1a1a" stroke-width="0.4" stroke-linejoin="round"/>
+<polygon points="489.2,385.2 470.6,396.0 470.6,380.0 489.2,369.2" fill="#a9a9a9" stroke="#1a1a1a" stroke-width="1" stroke-linejoin="round"/>
+<polygon points="431.6,373.5 470.6,396.0 470.6,380.0 431.6,357.5" fill="#929292" stroke="#1a1a1a" stroke-width="1" stroke-linejoin="round"/>
+<polygon points="450.2,346.8 489.2,369.2 470.6,380.0 431.6,357.5" fill="#cfcfcf" stroke="#1a1a1a" stroke-width="1" stroke-linejoin="round"/>
+<polygon points="566.7,365.0 506.1,400.0 506.1,387.5 566.7,352.5" fill="#1c1c1c" stroke="#1a1a1a" stroke-width="1" stroke-linejoin="round"/>
+<polygon points="484.4,387.5 506.1,400.0 506.1,387.5 484.4,375.0" fill="#141414" stroke="#1a1a1a" stroke-width="1" stroke-linejoin="round"/>
+<polygon points="545.0,340.0 566.7,352.5 506.1,387.5 484.4,375.0" fill="#2e2e2e" stroke="#1a1a1a" stroke-width="1" stroke-linejoin="round"/>
+<path d="M490.9,385.0 C480.1,388.8 493.1,401.5 503.4,396.5" fill="none" stroke="#e8e8e8" stroke-width="3.2" stroke-linecap="round"/>
+<path d="M490.9,385.0 C480.1,388.8 493.1,401.5 503.4,396.5" fill="none" stroke="#d63031" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M499.6,390.0 C490.9,392.5 511.3,397.0 514.4,390.2" fill="none" stroke="#e8e8e8" stroke-width="3.2" stroke-linecap="round"/>
+<path d="M499.6,390.0 C490.9,392.5 511.3,397.0 514.4,390.2" fill="none" stroke="#222" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M426.8,353.0 C335.9,425.5 240.2,730.0 365.8,777.5" fill="none" stroke="#8a8a8a" stroke-width="4.2" stroke-linecap="round"/>
+<path d="M426.8,353.0 C335.9,425.5 240.2,730.0 365.8,777.5" fill="none" stroke="#fafafa" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M435.5,358.0 C353.2,425.5 270.5,727.5 348.4,767.5" fill="none" stroke="#e8e8e8" stroke-width="4.0" stroke-linecap="round"/>
+<path d="M435.5,358.0 C353.2,425.5 270.5,727.5 348.4,767.5" fill="none" stroke="#16a085" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M354.9,581.2 C309.5,620.0 326.8,760.0 365.8,757.5" fill="none" stroke="#e8e8e8" stroke-width="5.0" stroke-linecap="round"/>
+<path d="M354.9,581.2 C309.5,620.0 326.8,760.0 365.8,757.5" fill="none" stroke="#d63031" stroke-width="3.4" stroke-linecap="round"/>
+<path d="M337.6,571.2 C305.1,602.5 322.5,742.5 348.4,747.5" fill="none" stroke="#e8e8e8" stroke-width="5.0" stroke-linecap="round"/>
+<path d="M337.6,571.2 C305.1,602.5 322.5,742.5 348.4,747.5" fill="none" stroke="#222" stroke-width="3.4" stroke-linecap="round"/>
+<line x1="538.1" y1="376.0" x2="608.3" y2="416.5" stroke="#2e86de" stroke-width="3" marker-end="url(#arrowBlue)"/>
+<path d="M636.8,833.9 A145.5,84.5 0 0 1 363.2,833.9" fill="none" stroke="#e67e22" stroke-width="3" marker-end="url(#arrowOrange)"/>
+<text x="500.0" y="913.5" font-size="13" font-weight="normal" text-anchor="middle" fill="#e67e22">the bottom turns (by hand, or the motor against the top)</text>
+<polyline points="536.8,323.2 740.0,170.0 747.0,170.0" fill="none" stroke="#999" stroke-width="1"/>
+<circle cx="536.8" cy="323.2" r="2.5" fill="#999"/>
+<text x="750.0" y="175.0" font-size="15" font-weight="bold" text-anchor="start" fill="#222">XIAO STM32C5</text>
+<text x="750.0" y="193.0" font-size="13" font-weight="normal" text-anchor="start" fill="#555">taped on the LiPo; IMU (LSM6DS3TR-C) on</text>
+<text x="750.0" y="210.0" font-size="13" font-weight="normal" text-anchor="start" fill="#555">board, CAN via the on-board TCAN3403;</text>
+<text x="750.0" y="227.0" font-size="13" font-weight="normal" text-anchor="start" fill="#555">two DuPont sockets glued on top (see left)</text>
+<polyline points="663.5,396.9 740.0,300.0 747.0,300.0" fill="none" stroke="#999" stroke-width="1"/>
+<circle cx="663.5" cy="396.9" r="2.5" fill="#999"/>
+<text x="750.0" y="305.0" font-size="15" font-weight="bold" text-anchor="start" fill="#222">2S LiHV LiPo</text>
+<text x="750.0" y="323.0" font-size="13" font-weight="normal" text-anchor="start" fill="#555">580 mAh, 71 × 15.5 × 13.5 mm, taped</text>
+<text x="750.0" y="340.0" font-size="13" font-weight="normal" text-anchor="start" fill="#555">across the RollerCAN; its + / − leads go</text>
+<text x="750.0" y="357.0" font-size="13" font-weight="normal" text-anchor="start" fill="#555">to the XT30 (2+2) plug</text>
+<polyline points="664.5,640.0 740.0,470.0 747.0,470.0" fill="none" stroke="#999" stroke-width="1"/>
+<circle cx="664.5" cy="640.0" r="2.5" fill="#999"/>
+<text x="750.0" y="475.0" font-size="15" font-weight="bold" text-anchor="start" fill="#222">Unit RollerCAN</text>
+<text x="750.0" y="493.0" font-size="13" font-weight="normal" text-anchor="start" fill="#555">40 × 40 × 40 mm: housing with OLED and</text>
+<text x="750.0" y="510.0" font-size="13" font-weight="normal" text-anchor="start" fill="#555">FOC driver; Grove PORT.A (5V for the XIAO),</text>
+<text x="750.0" y="527.0" font-size="13" font-weight="normal" text-anchor="start" fill="#555">XT30 (2+2): battery and CAN_H / CAN_L</text>
+<polyline points="624.3,770.0 740.0,620.0 747.0,620.0" fill="none" stroke="#999" stroke-width="1"/>
+<circle cx="624.3" cy="770.0" r="2.5" fill="#999"/>
+<text x="750.0" y="625.0" font-size="15" font-weight="bold" text-anchor="start" fill="#222">Motor (D3504, Ø41)</text>
+<text x="750.0" y="643.0" font-size="13" font-weight="normal" text-anchor="start" fill="#555">upside down: its rotor stands on the</text>
+<text x="750.0" y="660.0" font-size="13" font-weight="normal" text-anchor="start" fill="#555">table and turns, the housing holds still</text>
+<circle cx="357.1" cy="777.5" r="2.5" fill="#999"/>
+<line x1="357.1" y1="777.5" x2="300.0" y2="806.0" stroke="#999" stroke-width="1"/>
+<text x="296.0" y="800.0" font-size="15" font-weight="bold" text-anchor="end" fill="#222">XT30 (2+2) plug</text>
+<text x="296.0" y="818.0" font-size="13" font-weight="normal" text-anchor="end" fill="#555">battery + / −,</text>
+<text x="296.0" y="835.0" font-size="13" font-weight="normal" text-anchor="end" fill="#555">CAN_H / CAN_L</text>
+<line x1="750.0" y1="757.0" x2="778.0" y2="757.0" stroke="#16a085" stroke-width="2.4"/>
+<line x1="750.0" y1="763.0" x2="778.0" y2="763.0" stroke="#8a8a8a" stroke-width="4.2"/>
+<line x1="750.0" y1="763.0" x2="778.0" y2="763.0" stroke="#fafafa" stroke-width="2.4"/>
+<text x="788.0" y="764.0" font-size="12" font-weight="normal" text-anchor="start" fill="#555">CAN_H / CAN_L: XIAO CAN socket → XT30 plug</text>
+<line x1="750.0" y1="779.0" x2="778.0" y2="779.0" stroke="#d63031" stroke-width="2.4"/>
+<line x1="750.0" y1="785.0" x2="778.0" y2="785.0" stroke="#222" stroke-width="2.4"/>
+<text x="788.0" y="786.0" font-size="12" font-weight="normal" text-anchor="start" fill="#555">5V / GND: Grove plug → XIAO 5V socket</text>
+<line x1="750.0" y1="801.0" x2="778.0" y2="801.0" stroke="#d63031" stroke-width="3.4"/>
+<line x1="750.0" y1="807.0" x2="778.0" y2="807.0" stroke="#222" stroke-width="3.4"/>
+<text x="788.0" y="808.0" font-size="12" font-weight="normal" text-anchor="start" fill="#555">LiPo + / −: battery → XT30 plug</text>
+<line x1="750" y1="826" x2="774" y2="826" stroke="#2e86de" stroke-width="3" marker-end="url(#arrowBlue)"/>
+<text x="788.0" y="830.0" font-size="12" font-weight="normal" text-anchor="start" fill="#555">the top's front: keeps facing one direction</text>
+<text x="24.0" y="100.0" font-size="15" font-weight="bold" text-anchor="start" fill="#222">XIAO STM32C5, enlarged</text>
+<text x="24.0" y="118.0" font-size="12" font-weight="normal" text-anchor="start" fill="#777">21 × 17.8 mm, seen from the same side</text>
+<path d="M410.8,209.5 C457.5,178.0 480.9,160.0 504.3,146.5" fill="none" stroke="#e8e8e8" stroke-width="4.0" stroke-linecap="round"/>
+<path d="M410.8,209.5 C457.5,178.0 480.9,160.0 504.3,146.5" fill="none" stroke="#d63031" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M426.3,218.5 C473.1,187.0 496.5,169.0 519.9,155.5" fill="none" stroke="#e8e8e8" stroke-width="4.0" stroke-linecap="round"/>
+<path d="M426.3,218.5 C473.1,187.0 496.5,169.0 519.9,155.5" fill="none" stroke="#222" stroke-width="2.4" stroke-linecap="round"/>
+<polygon points="469.2,224.8 305.5,319.3 305.5,308.5 469.2,214.0" fill="#151515" stroke="#1a1a1a" stroke-width="1.3" stroke-linejoin="round"/>
+<polygon points="166.8,239.2 305.5,319.3 305.5,308.5 166.8,228.4" fill="#101010" stroke="#1a1a1a" stroke-width="1.3" stroke-linejoin="round"/>
+<polygon points="330.5,133.9 469.2,214.0 305.5,308.5 166.8,228.4" fill="#2a2a2a" stroke="#1a1a1a" stroke-width="1.3" stroke-linejoin="round"/>
+<polygon points="442.9,217.5 453.0,223.4 440.5,230.6 430.4,224.7" fill="#d4a017" stroke="#1a1a1a" stroke-width="0.4" stroke-linejoin="round"/>
+<polygon points="314.3,143.3 324.4,149.1 311.9,156.3 301.8,150.5" fill="#d4a017" stroke="#1a1a1a" stroke-width="0.4" stroke-linejoin="round"/>
+<polygon points="423.1,228.9 433.2,234.8 420.7,242.0 410.6,236.1" fill="#d4a017" stroke="#1a1a1a" stroke-width="0.4" stroke-linejoin="round"/>
+<polygon points="294.5,154.7 304.6,160.5 292.1,167.7 282.0,161.9" fill="#d4a017" stroke="#1a1a1a" stroke-width="0.4" stroke-linejoin="round"/>
+<polygon points="403.3,240.4 413.4,246.2 400.9,253.4 390.8,247.6" fill="#d4a017" stroke="#1a1a1a" stroke-width="0.4" stroke-linejoin="round"/>
+<polygon points="274.7,166.1 284.8,172.0 272.3,179.2 262.2,173.3" fill="#d4a017" stroke="#1a1a1a" stroke-width="0.4" stroke-linejoin="round"/>
+<polygon points="383.5,251.8 393.6,257.6 381.1,264.8 371.0,259.0" fill="#d4a017" stroke="#1a1a1a" stroke-width="0.4" stroke-linejoin="round"/>
+<polygon points="254.9,177.5 265.0,183.4 252.5,190.6 242.4,184.8" fill="#d4a017" stroke="#1a1a1a" stroke-width="0.4" stroke-linejoin="round"/>
+<polygon points="363.7,263.2 373.8,269.1 361.3,276.3 351.2,270.4" fill="#d4a017" stroke="#1a1a1a" stroke-width="0.4" stroke-linejoin="round"/>
+<polygon points="235.1,189.0 245.2,194.8 232.7,202.0 222.6,196.2" fill="#d4a017" stroke="#1a1a1a" stroke-width="0.4" stroke-linejoin="round"/>
+<polygon points="343.9,274.7 354.0,280.5 341.5,287.7 331.4,281.9" fill="#d4a017" stroke="#1a1a1a" stroke-width="0.4" stroke-linejoin="round"/>
+<polygon points="215.3,200.4 225.4,206.3 212.9,213.5 202.8,207.6" fill="#d4a017" stroke="#1a1a1a" stroke-width="0.4" stroke-linejoin="round"/>
+<polygon points="324.1,286.1 334.2,291.9 321.7,299.1 311.6,293.3" fill="#d4a017" stroke="#1a1a1a" stroke-width="0.4" stroke-linejoin="round"/>
+<polygon points="195.5,211.8 205.6,217.7 193.1,224.9 183.0,219.0" fill="#d4a017" stroke="#1a1a1a" stroke-width="0.4" stroke-linejoin="round"/>
+<polygon points="415.4,200.9 318.0,257.2 318.0,250.0 415.4,193.8" fill="#cfcfcf" stroke="#1a1a1a" stroke-width="0.8" stroke-linejoin="round"/>
+<polygon points="255.6,221.2 318.0,257.2 318.0,250.0 255.6,214.0" fill="#bdbdbd" stroke="#1a1a1a" stroke-width="0.8" stroke-linejoin="round"/>
+<polygon points="353.1,157.8 415.4,193.8 318.0,250.0 255.6,214.0" fill="#eeeeee" stroke="#1a1a1a" stroke-width="0.8" stroke-linejoin="round"/>
+<path d="M295.4,151.9 C334.4,120.4 368.7,142.4 360.9,162.2" fill="none" stroke="#8a8a8a" stroke-width="3.4000000000000004" stroke-linecap="round"/>
+<path d="M295.4,151.9 C334.4,120.4 368.7,142.4 360.9,162.2" fill="none" stroke="#fafafa" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M311.0,160.9 C342.2,133.9 384.3,151.4 376.5,171.2" fill="none" stroke="#e8e8e8" stroke-width="3.2" stroke-linecap="round"/>
+<path d="M311.0,160.9 C342.2,133.9 384.3,151.4 376.5,171.2" fill="none" stroke="#16a085" stroke-width="1.6" stroke-linecap="round"/>
+<polygon points="322.7,178.9 213.6,241.9 213.6,219.4 322.7,156.4" fill="#1c1c1c" stroke="#1a1a1a" stroke-width="1" stroke-linejoin="round"/>
+<polygon points="174.6,219.4 213.6,241.9 213.6,219.4 174.6,196.9" fill="#141414" stroke="#1a1a1a" stroke-width="1" stroke-linejoin="round"/>
+<polygon points="283.7,133.9 322.7,156.4 213.6,219.4 174.6,196.9" fill="#2e2e2e" stroke="#1a1a1a" stroke-width="1" stroke-linejoin="round"/>
+<polygon points="180.8,217.6 190.2,223.0 190.2,211.3 180.8,205.9" fill="#000" stroke="#1a1a1a" stroke-width="0.4" stroke-linejoin="round"/>
+<polygon points="200.3,228.9 209.7,234.2 209.7,222.5 200.3,217.2" fill="#000" stroke="#1a1a1a" stroke-width="0.4" stroke-linejoin="round"/>
+<polygon points="298.5,272.9 265.0,292.3 265.0,263.5 298.5,244.2" fill="#a9a9a9" stroke="#1a1a1a" stroke-width="1" stroke-linejoin="round"/>
+<polygon points="194.9,251.8 265.0,292.3 265.0,263.5 194.9,223.0" fill="#929292" stroke="#1a1a1a" stroke-width="1" stroke-linejoin="round"/>
+<polygon points="228.4,203.7 298.5,244.2 265.0,263.5 194.9,223.0" fill="#cfcfcf" stroke="#1a1a1a" stroke-width="1" stroke-linejoin="round"/>
+<polygon points="438.0,236.5 328.9,299.5 328.9,277.0 438.0,214.0" fill="#1c1c1c" stroke="#1a1a1a" stroke-width="1" stroke-linejoin="round"/>
+<polygon points="289.9,277.0 328.9,299.5 328.9,277.0 289.9,254.5" fill="#141414" stroke="#1a1a1a" stroke-width="1" stroke-linejoin="round"/>
+<polygon points="399.1,191.5 438.0,214.0 328.9,277.0 289.9,254.5" fill="#2e2e2e" stroke="#1a1a1a" stroke-width="1" stroke-linejoin="round"/>
+<path d="M301.6,272.5 C282.1,279.2 305.5,302.2 324.1,293.3" fill="none" stroke="#e8e8e8" stroke-width="3.2" stroke-linecap="round"/>
+<path d="M301.6,272.5 C282.1,279.2 305.5,302.2 324.1,293.3" fill="none" stroke="#d63031" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M317.2,281.5 C301.6,286.0 338.3,294.1 343.9,281.9" fill="none" stroke="#e8e8e8" stroke-width="3.2" stroke-linecap="round"/>
+<path d="M317.2,281.5 C301.6,286.0 338.3,294.1 343.9,281.9" fill="none" stroke="#222" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M186.3,214.9 C155.1,235.6 131.7,251.8 108.3,267.1" fill="none" stroke="#8a8a8a" stroke-width="4.2" stroke-linecap="round"/>
+<path d="M186.3,214.9 C155.1,235.6 131.7,251.8 108.3,267.1" fill="none" stroke="#fafafa" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M201.9,223.9 C170.7,244.6 147.3,260.8 123.9,276.1" fill="none" stroke="#e8e8e8" stroke-width="4.0" stroke-linecap="round"/>
+<path d="M201.9,223.9 C170.7,244.6 147.3,260.8 123.9,276.1" fill="none" stroke="#16a085" stroke-width="2.4" stroke-linecap="round"/>
+<text x="106.2" y="295.8" font-size="12" font-weight="normal" text-anchor="middle" fill="#555">to the XT30 plug</text>
+<text x="526.0" y="156.8" font-size="12" font-weight="normal" text-anchor="start" fill="#555">to the Grove port</text>
+<circle cx="370.2" cy="163.2" r="2.2" fill="#999"/>
+<line x1="370.2" y1="163.2" x2="386.0" y2="132.0" stroke="#999" stroke-width="1"/>
+<text x="390.0" y="136.0" font-size="12" font-weight="normal" text-anchor="start" fill="#555">CANH / CANL pads (back)</text>
+<circle cx="335.9" cy="288.2" r="2.2" fill="#999"/>
+<line x1="335.9" y1="288.2" x2="382.0" y2="314.0" stroke="#999" stroke-width="1"/>
+<text x="386.0" y="318.0" font-size="12" font-weight="normal" text-anchor="start" fill="#555">5V / GND pads</text>
+<circle cx="229.9" cy="257.7" r="2.2" fill="#999"/>
+<line x1="229.9" y1="257.7" x2="204.0" y2="314.0" stroke="#999" stroke-width="1"/>
+<text x="200.0" y="318.0" font-size="12" font-weight="normal" text-anchor="end" fill="#555">USB-C</text>
+<circle cx="248.6" cy="176.6" r="2.2" fill="#999"/>
+<line x1="248.6" y1="176.6" x2="114.0" y2="162.0" stroke="#999" stroke-width="1"/>
+<text x="110.0" y="166.0" font-size="12" font-weight="normal" text-anchor="end" fill="#555">CAN socket</text>
+<circle cx="340.6" cy="247.8" r="2.2" fill="#999"/>
+<line x1="340.6" y1="247.8" x2="482.0" y2="248.0" stroke="#999" stroke-width="1"/>
+<text x="486.0" y="252.0" font-size="12" font-weight="normal" text-anchor="start" fill="#555">5V / GND socket</text>
 </svg>

@@ -64,14 +64,14 @@ XIAO, on the part that has to stay still.
 2. **Power**: at first I built a cable to run the RollerCAN from a bench power supply. Later a small 2S LiPo went
    straight onto the RollerCAN's XT30, and the unit was standalone.
 3. **Wiring**: the RollerCAN's XT30 (2+2) connector carries power and CAN. The battery goes on its power pins, the
-   XIAO's CANH/CANL on its CAN_H/CAN_L pins, ground to ground. The XIAO gets 5V from the RollerCAN's Grove port, so it
+   XIAO's CANH/CANL on its CAN_H/CAN_L pins. The XIAO gets 5V from the RollerCAN's Grove port, so it
    doesn't need USB.
-4. **Mounting**: the battery lies flat on the RollerCAN's body, the XIAO on the battery, all taped down. The XIAO can
+4. **Mounting**: the battery (71 × 15.5 × 13.5 mm) lies across the RollerCAN's 40 mm body, the XIAO on the battery, all taped down. The XIAO can
    sit at any angle: when it calibrates, the firmware takes the motor axis from gravity.
 
 On the RollerCAN itself (its screen menu): communication CAN, 1 Mbit/s, ID 0xA8 (the default), default PID preset.
 
-![Exploded sketch: XIAO STM32C5, battery, RollerCAN body, rotor, and the wiring](exploded.svg)
+![Exploded sketch, to scale: the XIAO STM32C5 with its two DuPont sockets, the LiPo, the RollerCAN, and the wiring between them](exploded.svg)
 
 ## The firmware
 
@@ -208,8 +208,8 @@ motor can turn the bottom fast when the top is held: keep cables clear.
 
 The exploded sketch (`docs/exploded.svg`) and the wiring:
 
-- RollerCAN XT30 (2+2): battery on the power pins, XIAO CANH/CANL on CAN_H/CAN_L, XIAO GND to GND
-- RollerCAN Grove port: 5V and GND to the XIAO's 5V and GND
+- RollerCAN XT30 (2+2): battery + / − on the power pins, XIAO CANH/CANL on CAN_H/CAN_L
+- RollerCAN Grove port: 5V and GND to the XIAO's 5V and GND (also the CAN ground)
 - XIAO's 120 Ω CAN termination: on (as delivered)
 
 # Code

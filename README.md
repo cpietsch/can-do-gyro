@@ -7,8 +7,7 @@ the bottom, the top keeps facing the same direction in the room. It works standi
 upside down.
 
 <p align="center">
-  <img src="docs/photo.jpg" alt="The unit: RollerCAN at the bottom, battery and XIAO STM32C5 taped on top" width="360">
-  <img src="docs/exploded.svg" alt="Exploded sketch: XIAO STM32C5, battery, RollerCAN body, rotor, and the wiring" width="460">
+  <img src="docs/photo.jpg" alt="The unit: RollerCAN at the bottom, battery and XIAO STM32C5 taped on top" width="420">
 </p>
 
 An M5Stack [Unit RollerCAN](https://docs.m5stack.com/en/unit/Unit_RollerCAN) stands on its motor: the round rotor is
@@ -36,7 +35,7 @@ computed on the chip.
 Everything this needs is on the thumb-sized board, so the whole controller is the XIAO plus four wires:
 
 - **CAN with an on-board transceiver**: the STM32C5A3CG has two FDCAN controllers; one is wired to a TI TCAN3403 with
-  CANH/CANL pads and a 120 Ω termination (on as delivered). Two wires go to the motor, plus ground. The RollerCAN only
+  CANH/CANL pads and a 120 Ω termination (on as delivered). Two wires go to the motor. The RollerCAN only
   speaks classic CAN 2.0, so this uses 1 Mbit/s classic frames; the controller can do CAN FD.
 - **On-board 6-axis IMU** (LSM6DS3TR-C, I2C): gyro at 416 Hz through its FIFO, every sample used.
 - **Cortex-M33 at 144 MHz with FPU**: a quaternion update per gyro sample, the control law and CAN traffic every loop
@@ -57,10 +56,14 @@ Everything this needs is on the thumb-sized board, so the whole controller is th
 
 Wiring:
 
+<p align="center">
+  <img src="docs/exploded.svg" alt="Exploded sketch, to scale: the XIAO STM32C5 with its two DuPont sockets, the LiPo, the RollerCAN, and the wiring between them" width="820">
+</p>
+
 The RollerCAN's XT30 (2+2) connector carries both power and CAN:
 
 - Battery on its power pins.
-- XIAO **CANH / CANL** pads to its CAN_H / CAN_L pins, XIAO GND to its GND.
+- XIAO **CANH / CANL** pads to its CAN_H / CAN_L pins (the ground is shared through the Grove cable).
 - XIAO **5V** and GND from the RollerCAN's Grove port, so it runs standalone without USB.
 
 The XIAO can sit at any angle: calibration takes the motor axis from gravity. Mounted here: the battery lies flat on
