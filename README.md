@@ -56,6 +56,10 @@ Everything this needs is on the thumb-sized board, so the whole controller is th
 
 Wiring:
 
+<p align="center">
+  <img src="docs/wiring.svg" alt="Wiring: LiPo + and − to the RollerCAN's XT30 power pins, the XIAO's CAN H and L pads to its CAN pins, the RollerCAN's Grove 5V and GND to the XIAO's VBUS and GND" width="780">
+</p>
+
 The RollerCAN's XT30 (2+2) connector carries both power and CAN:
 
 - Battery on its power pins.

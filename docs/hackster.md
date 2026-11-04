@@ -11,7 +11,7 @@ upload the images where they are referenced.
 | Difficulty | Intermediate |
 | License | MIT |
 | Code | https://github.com/cpietsch/can-do-gyro |
-| Schematics | the wiring list below |
+| Schematics | the wiring diagram (`docs/wiring.svg`, as PNG) and the wiring list below |
 
 **Things used in this project**
 
@@ -70,6 +70,8 @@ XIAO, on the part that has to stay still.
    sit at any angle: when it calibrates, the firmware takes the motor axis from gravity.
 
 On the RollerCAN itself (its screen menu): communication CAN, 1 Mbit/s, ID 0xA8 (the default), default PID preset.
+
+![Wiring: LiPo to the RollerCAN's XT30, the XIAO's CAN H/L pads to its CAN pins, Grove 5V/GND to the XIAO](wiring.svg)
 
 ## The firmware
 
@@ -203,6 +205,8 @@ motor can turn the bottom fast when the top is held: keep cables clear.
 ---
 
 # Schematics
+
+![Wiring diagram](wiring.svg)
 
 The wiring:
 
