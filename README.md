@@ -6,7 +6,8 @@ the bottom, the top keeps facing the same direction in the room. It works standi
 upside down.
 
 <p align="center">
-  <img src="docs/photo.jpg" alt="The unit: RollerCAN at the bottom, battery and XIAO STM32C5 taped on top" width="420">
+  <a href="https://youtu.be/w_WODAGTqgk"><img src="https://img.youtube.com/vi/w_WODAGTqgk/maxresdefault.jpg" alt="Demo video on YouTube: CAN do GYRO" width="640"></a>
+  <br><a href="https://youtu.be/w_WODAGTqgk">▶ Watch the demo video on YouTube</a>
 </p>
 
 An M5Stack [Unit RollerCAN](https://docs.m5stack.com/en/unit/Unit_RollerCAN) stands on its motor: the round rotor is
@@ -52,6 +53,10 @@ Everything this needs is on the thumb-sized board, so the whole controller is th
 - Female DuPont pigtails, soldered to the XIAO's CANH/CANL pads and 5V/GND and glued down on top with superglue, so
   CAN and power plug in and out
 - Something to hold battery and XIAO on the RollerCAN's body (tape works)
+
+<p align="center">
+  <img src="docs/photo.jpg" alt="The unit: RollerCAN at the bottom, battery and XIAO STM32C5 taped on top" width="420">
+</p>
 
 Wiring:
 
