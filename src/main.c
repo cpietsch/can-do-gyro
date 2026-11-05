@@ -11,15 +11,20 @@
 #include <stdlib.h>
 #include <string.h>
 #include <zephyr/drivers/can.h>
+#include <cmsis_core.h>
 #include <zephyr/drivers/flash.h>
 #include <zephyr/drivers/gpio.h>
+#include <zephyr/drivers/hwinfo.h>
 #include <zephyr/drivers/i2c.h>
 #include <zephyr/drivers/pwm.h>
 #include <zephyr/drivers/uart.h>
+#include <zephyr/drivers/watchdog.h>
+#include <zephyr/fatal.h>
 #include <zephyr/kernel.h>
 #include <zephyr/storage/flash_map.h>
 #include <zephyr/sys/byteorder.h>
 #include <zephyr/sys/printk.h>
+#include <zephyr/sys/reboot.h>
 
 // ---- Settings (tuned by hand and from recordings, standalone on the battery) ----
 
@@ -139,7 +144,7 @@
 #define HEATER_INTERVAL_MS 500
 #define HEATER_KP 0.025f            // duty per degree C
 #define HEATER_KI 0.002f            // duty per degree C x s
-#define HEATER_INTEGRAL_MAX 180.0f  // degree C x s
+#define HEATER_INTEGRAL_MAX 300.0f  // degree C x s: HEATER_KI x this reaches HEATER_DUTY_MAX (180 stuck at ~36 C)
 #define HEATER_DUTY_MAX 0.6f
 #define HEATER_DUTY_STEP 0.05f      // per update
 #define HEATER_CUTOFF_C 50.0f       // above this, or without a reading: heater off
@@ -165,6 +170,7 @@
 // in the OTA slot (480 KB in flash bank 2: the code runs from bank 1, so writing doesn't stall it): ~30 s at the 1 ms
 // loop. Kept until "erase" (reset, power off and reflashing don't touch it); a boot records only when it's empty.
 // "dump" prints it, log.py turns that into a CSV.
+#define LOG_ERASE_BLOCK DT_PROP(DT_CHOSEN(zephyr_flash), erase_block_size)
 #define LOG_MAGIC 0x474F4C52  // "RLOG"
 #define LOG_VERSION 2
 typedef struct __packed {
@@ -267,6 +273,84 @@ static uint32_t logOffset = 0;  // next record while recording, 0 = not recordin
 static uint32_t logRecords = 0;
 static uint32_t logUs = 0;
 
+// ---- Crash record ----
+// Why the last run ended, kept across the reset in RAM that isn't cleared at boot: a fault (Zephyr's fatal error
+// handler, then a reboot) or a hang (the watchdog resets when the loop stops for WATCHDOG_MS; its early warning
+// interrupt notes where the main thread was just before). Shown at boot and by "i". The addresses:
+// arm-none-eabi-addr2line -f -e .pio/build/xiao/firmware.elf <pc> <lr>
+#define WATCHDOG_MS 2000
+#define CRASH_MAGIC 0x48535243  // "CRSH"
+#define CRASH_HANG 0xFF         // reason of a watchdog record (Zephyr's fault reasons are 0-4)
+enum { STAGE_BOOT, STAGE_HEATER, STAGE_IMU, STAGE_SERIAL, STAGE_BATTERY, STAGE_HOLD, STAGE_LOG, STAGE_SLEEP,
+       STAGE_CALIBRATE, STAGE_FIND, STAGE_COMMAND };
+static const char *const stageNames[] = {"boot",      "heater", "IMU",       "serial input",  "battery", "hold (CAN)",
+                                         "recording", "sleep",  "calibrate", "find RollerCAN", "command"};
+typedef struct {
+  uint32_t magic, reason, pc, lr, cfsr, stage, uptimeMs, holding, check;
+} CrashRecord;
+static __noinit CrashRecord crash;
+static CrashRecord lastCrash;          // the record found at boot (magic 0: none)
+static uint32_t resetCause = 0;        // hwinfo RESET_* flags at boot
+static volatile uint32_t stage = STAGE_BOOT;  // what the main loop is doing
+static const struct device *const watchdog = DEVICE_DT_GET(DT_ALIAS(watchdog0));
+static int watchdogChannel = -1;
+
+static uint32_t crashCheck(const CrashRecord *r) {
+  const uint32_t *w = (const uint32_t *)r;
+  uint32_t sum = 0x2545F491;
+  for (size_t i = 0; i < offsetof(CrashRecord, check) / sizeof *w; i++) sum = sum * 31 + w[i];
+  return sum;
+}
+
+static void crashNote(uint32_t reason, uint32_t pc, uint32_t lr) {
+  crash = (CrashRecord){.magic = CRASH_MAGIC, .reason = reason, .pc = pc, .lr = lr, .cfsr = SCB->CFSR,
+                        .stage = stage, .uptimeMs = (uint32_t)k_uptime_get(), .holding = holding};
+  crash.check = crashCheck(&crash);
+}
+
+// Replaces Zephyr's handler, which halts (the board then looks dead: LED stopped, USB silent, motor holding)
+void k_sys_fatal_error_handler(unsigned int reason, const struct arch_esf *esf) {
+  crashNote(reason, esf ? esf->basic.pc : 0, esf ? esf->basic.lr : 0);
+  sys_reboot(SYS_REBOOT_COLD);
+  CODE_UNREACHABLE;
+}
+
+// Watchdog early warning (an interrupt, shortly before the reset): the interrupted thread's stacked pc and lr
+static void watchdogWarning(const struct device *dev, int channel) {
+  const uint32_t *frame = (const uint32_t *)__get_PSP();
+  crashNote(CRASH_HANG, frame[6], frame[5]);
+}
+
+static void feedWatchdog(void) {
+  if (watchdogChannel >= 0) wdt_feed(watchdog, watchdogChannel);
+}
+
+static void watchdogStart(void) {
+  struct wdt_timeout_cfg cfg = {.window = {.max = WATCHDOG_MS}, .callback = watchdogWarning,
+                                .flags = WDT_FLAG_RESET_SOC};
+  watchdogChannel = device_is_ready(watchdog) ? wdt_install_timeout(watchdog, &cfg) : -ENODEV;
+  if (watchdogChannel < 0 || wdt_setup(watchdog, WDT_OPT_PAUSE_HALTED_BY_DBG)) {
+    printk("watchdog setup failed (%d)\n", watchdogChannel);
+    watchdogChannel = -1;
+  }
+}
+
+static void lastResetPrint(void) {
+  if (lastCrash.magic != CRASH_MAGIC) {
+    printk("last reset: cause 0x%x (1 pin, 2 software, 4 brownout, 8 power on, 0x10 watchdog), no crash record\n",
+           resetCause);
+    return;
+  }
+  const char *where = lastCrash.stage < ARRAY_SIZE(stageNames) ? stageNames[lastCrash.stage] : "?";
+  if (lastCrash.reason == CRASH_HANG)
+    printk("last reset: HUNG in %s after %u s (%s), watchdog; main thread at pc 0x%08x lr 0x%08x\n", where,
+           lastCrash.uptimeMs / 1000, lastCrash.holding ? "holding" : "not holding", lastCrash.pc, lastCrash.lr);
+  else
+    printk("last reset: FAULT %u (0 CPU exception, 2 stack, 3 oops, 4 panic) in %s after %u s (%s): pc 0x%08x lr "
+           "0x%08x cfsr 0x%08x\n", lastCrash.reason, where, lastCrash.uptimeMs / 1000,
+           lastCrash.holding ? "holding" : "not holding", lastCrash.pc, lastCrash.lr, lastCrash.cfsr);
+}
+
 static void timeTo(int part) {
   uint32_t c = k_cycle_get_32();
   timing[part] += c - timingMark;
@@ -276,7 +360,19 @@ static void timeTo(int part) {
 // ---- CAN ----
 
 // Not used: an unanswered frame stays queued (the controller retries until it's acknowledged), see findRoller()
-static void txDone(const struct device *dev, int error, void *user_data) {}
+// CAN trouble since boot (for "i"): failed transmissions, and how often the controller entered each error state
+static volatile uint32_t txErrors = 0, canStates[4] = {0};
+static volatile uint8_t canTxErr = 0, canRxErr = 0;  // error counters at the last state change
+
+static void txDone(const struct device *dev, int error, void *user_data) {
+  if (error) txErrors++;
+}
+
+static void canStateChanged(const struct device *dev, enum can_state state, struct can_bus_err_cnt err, void *user_data) {
+  if (state < ARRAY_SIZE(canStates)) canStates[state]++;
+  canTxErr = err.tx_err_cnt;
+  canRxErr = err.rx_err_cnt;
+}
 
 static void transmit(uint8_t type, uint16_t index, int32_t value, k_timeout_t timeout) {
   struct can_frame f = {
@@ -374,6 +470,7 @@ static void motorOff(void) {
 // without power) stay queued and block the TX buffers, so restart the controller first. Once found: motor off, position
 // mode, current limits, stiffness.
 static void findRoller(void) {
+  stage = STAGE_FIND;
   can_stop(can);
   can_start(can);
   struct can_frame f;
@@ -598,6 +695,7 @@ static void facingReset(void) {
 static void calibrate(void) {
   float g[3], a[3], gSum[3] = {0}, aSum[3] = {0}, wSum[3] = {0}, wMin[3], wMax[3];
   int n = 0, w = 0, windows = 0;
+  stage = STAGE_CALIBRATE;
   printk("calibrating the gyro: keep it still for %d s\n", CALIBRATION_MS / 1000);
   int64_t start = k_uptime_get();
   while (k_uptime_get() - start < CALIBRATION_MS) {
@@ -623,6 +721,7 @@ static void calibrate(void) {
       w = 0;
       windows++;
     }
+    feedWatchdog();
     k_usleep(LOOP_US);
   }
   float spread = 0, gravity = sqrtf(dot(aSum, aSum)) / n;
@@ -745,9 +844,12 @@ static void logStart(void) {
 static bool logErase(void) {
   printk("recording: erasing...\n");
   logOffset = logRecords = 0;
-  if (flash_area_erase(logArea, 0, logArea->fa_size)) {
-    printk("recording: erase failed\n");
-    return false;
+  for (uint32_t offset = 0; offset < logArea->fa_size; offset += LOG_ERASE_BLOCK) {
+    feedWatchdog();  // the whole area takes longer than WATCHDOG_MS
+    if (flash_area_erase(logArea, offset, MIN(LOG_ERASE_BLOCK, logArea->fa_size - offset))) {
+      printk("recording: erase failed\n");
+      return false;
+    }
   }
   return true;
 }
@@ -821,6 +923,7 @@ static void logDump(void) {
     uint32_t dtr = 0;
     uart_line_ctrl_get(console, UART_LINE_CTRL_DTR, &dtr);
     if (!dtr) break;  // the terminal went away
+    feedWatchdog();
     uint8_t b[sizeof(LogRecord)];
     char line[2 * sizeof b + 1];
     flash_area_read(logArea, sizeof h + i * sizeof b, b, sizeof b);
@@ -890,6 +993,11 @@ static void status(void) {
     memset(timing, 0, sizeof timing);
     timingLoops = 0;
   }
+  lastResetPrint();
+  printk("CAN since boot: %u failed transmissions, error warning %u x, passive %u x, bus-off %u x, back to active %u x "
+         "(last counters tx %u rx %u)\n", txErrors, canStates[CAN_STATE_ERROR_WARNING],
+         canStates[CAN_STATE_ERROR_PASSIVE], canStates[CAN_STATE_BUS_OFF], canStates[CAN_STATE_ERROR_ACTIVE], canTxErr,
+         canRxErr);
   if (faults) printk("faults: 0x%x (1 overvoltage, 2 stall, 4 out of range)\n", faults);
   if (logOffset) printk("recording: %u records (%.1f s)\n", logRecords, logUs / 1e6);
   else if (logArea) printk("recording: %u records kept, not recording (dump, erase)\n", logRecords);
@@ -974,16 +1082,23 @@ int main(void) {
   uart_irq_rx_enable(console);
   k_msleep(1000);  // give the host a moment to open the USB serial port
   printk("can-do-gyro: max current %d mA\n", MAX_CURRENT_MA);
+  hwinfo_get_reset_cause(&resetCause);
+  hwinfo_clear_reset_cause();
+  if (crash.magic == CRASH_MAGIC && crash.check == crashCheck(&crash)) lastCrash = crash;
+  crash.magic = 0;
+  lastResetPrint();
 
   struct can_filter all = {.flags = CAN_FILTER_IDE, .id = 0, .mask = 0};  // every extended frame
   if (!device_is_ready(can) || can_set_bitrate(can, CAN_BITRATE) || can_add_rx_filter_msgq(can, &rx, &all) < 0 ||
       can_start(can)) {
     printk("CAN setup failed\n");
   }
+  can_set_state_change_callback(can, canStateChanged, NULL);
   findRoller();
   imuOk = imuInit();
   heaterSince = k_uptime_get();
   logInit();
+  watchdogStart();
   handleCommand("?");  // print the commands
 
   int64_t lastTry = k_uptime_get(), lastBlink = 0, windowStart = 0, quietUntil = 0, lastBattery = 0;
@@ -997,6 +1112,7 @@ int main(void) {
   bool tooLong = false, connected = false;
   while (true) {
     int64_t now = k_uptime_get();
+    feedWatchdog();
 
     // Heartbeat on the user LED, fast while the RollerCAN or the IMU is missing
     if (now - lastBlink >= (found && imuOk ? 500 : 100)) {
@@ -1009,6 +1125,7 @@ int main(void) {
       if (!imuOk) imuOk = imuInit();
     }
     if (now - lastHeater >= HEATER_INTERVAL_MS) {
+      stage = STAGE_HEATER;
       lastHeater = now;
       heaterUpdate(now);
     }
@@ -1038,6 +1155,7 @@ int main(void) {
     lastCycles = cycles;
     logUs += lroundf(dt * 1e6f);
     if (imuOk && calibrated) {
+      stage = STAGE_IMU;
       uint32_t loopStart = k_cycle_get_32();
       timingMark = loopStart;
       int n = readGyroFifo(gs, FIFO_MAX_SAMPLES);
@@ -1103,6 +1221,7 @@ int main(void) {
 
     // A terminal connected (DTR on): the output buffered meanwhile reaches it at once, and Linux echoes it back until
     // the port is raw. Ignore what comes in during INPUT_QUIET_MS, the half line it leaves would eat the first command.
+    stage = STAGE_SERIAL;
     uint32_t dtr = 0;
     uart_line_ctrl_get(console, UART_LINE_CTRL_DTR, &dtr);
     if (dtr && !connected) quietUntil = now + INPUT_QUIET_MS;
@@ -1114,6 +1233,7 @@ int main(void) {
         tooLong = false;
       } else if (c == '\r' || c == '\n') {
         line[len] = 0;
+        stage = STAGE_COMMAND;
         if (!tooLong) handleCommand(line);
         len = 0;
         tooLong = false;
@@ -1125,6 +1245,7 @@ int main(void) {
     }
 
     if (found && now - lastBattery >= BATTERY_CHECK_MS) {
+      stage = STAGE_BATTERY;
       lastBattery = now;
       checkBattery(now);
     }
@@ -1133,6 +1254,7 @@ int main(void) {
 
     // Holding: the rotor's target is where it is now, minus how far the top is off, plus its turning rate times the
     // damping, plus the integral. The RollerCAN's position controller pushes with positionKp mA per degree of that.
+    stage = STAGE_HOLD;
     if (holding && fabs(turned) > RUNAWAY_DEG) {
       printk("the top got %.0f deg off (held?): its direction now counts as the new one\n", turned);
       hold();
@@ -1158,8 +1280,10 @@ int main(void) {
       }
       timeTo(T_WRITE);
     }
+    stage = STAGE_LOG;
     logWrite(logFlags);
 
+    stage = STAGE_SLEEP;
     timingMark = k_cycle_get_32();
     k_usleep(LOOP_US);
     if (holding) timeTo(T_SLEEP);

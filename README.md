@@ -92,7 +92,8 @@ which has to be mounted (desktops do that by themselves). If the firmware hangs 
 double-tap the XIAO's reset button and upload again.
 
 `platformio.ini` also pins a newer ARM GCC (12.3) than the platform asks for: the requested 8.2.1 has no Linux ARM64
-build.
+build. Before every build `patch_zephyr.py` fixes a crash in Zephyr 4.4's CAN driver (see Notes below); it edits the
+framework package in `~/.platformio` once and keeps the original as `can_mcan.c.orig`.
 
 ## Using it
 
@@ -116,7 +117,7 @@ answer, so a terminal that echoes the XIAO's own output back (Linux does until t
 | `d <ms>` | damping, 0 to 500, until reset |
 | `f` | flip the motor direction until reset |
 | `t` | IMU heater off / on until reset (to compare) |
-| `i` | status: deviation, rotor, current, voltage, temperature, gyro offset and noise, standing-still windows, tilt, IMU temperature and heater, loop timing, battery, recording |
+| `i` | status: deviation, rotor, current, voltage, temperature, gyro offset and noise, standing-still windows, tilt, IMU temperature and heater, loop timing, last reset (crash record), CAN errors, battery, recording |
 | `dump` | print the recording (motor off meanwhile), see below |
 | `erase` | clear the recording; the next boot records |
 | `?` | list the commands |
@@ -142,8 +143,13 @@ answer, so a terminal that echoes the XIAO's own output back (Linux does until t
   isn't integrated and the offset follows the gyro, so the direction doesn't drift at rest.
 - **IMU heater**: the gyro's offset wanders with temperature, so the IMU is kept at 40 °C by the heater resistors
   around it: PI regulation on the IMU's own temperature sensor every 0.5 s, PWM on PA8, at most 60% duty (gains and
-  limits from Seeed's `zephyr-imu-temp-pid-6axis` example). The gyro is calibrated once the IMU has held 40 °C for
-  10 s. Above 50 °C or without a temperature reading the heater is off.
+  limits from Seeed's `zephyr-imu-temp-pid-6axis` example, but the integral may use the whole 60%: with Seeed's cap
+  it got stuck at ~36 °C in open air). The gyro is calibrated once the IMU has held 40 °C ±0.5 for 10 s, or after
+  2 minutes at the latest. Above 50 °C or without a temperature reading the heater is off.
+- **Crash record**: a CPU fault reboots the board, and a watchdog reboots it when the loop stops for 2 s. Before that,
+  the fault handler (or the watchdog's early warning interrupt) notes the address, the loop stage and the uptime in
+  RAM that survives the reset; `i` shows it as "last reset". Look the address up with
+  `arm-none-eabi-addr2line -f -e .pio/build/xiao/firmware.elf <pc> <lr>`.
 - **Never gives up**: no turn limit (the RollerCAN counts ~59,000 turns), the top more than 90° off (held by hand)
   makes its current direction the new one, and after the RollerCAN's stall protection (blocked ~3 s) it holds again
   after 3 s. Only an empty battery switches the motor off.
@@ -207,6 +213,10 @@ Things learned along the way, in case they save you time:
   Set `CONFIG_CAN_INIT_PRIORITY=80` as in Seeed's examples, so CAN starts after the GPIOs. The M_CAN controller has
   no one-shot mode: frames nobody acknowledges (motor unpowered) stay queued and block the TX buffers, so
   `can_stop()` / `can_start()` before looking for the motor again.
+- **CAN driver crash**: Zephyr 4.4's M_CAN driver calls a TX buffer's callback from the TX event without checking it.
+  After a bus-off, the bus-off handler has already completed that buffer, and the late TX event jumps to address 0:
+  a fault in the CAN interrupt, here every few minutes while holding (LED stopped, USB silent, the motor kept its last
+  target). Upstream Zephyr added the check after 4.4; `patch_zephyr.py` applies it.
 - **USB serial**: Zephyr's CDC ACM (`device_next`). Read it with the interrupt API: with `uart_poll_in()` only, no
   receive is ever queued and writes from the host hang.
 - **Stack**: the default 2 KB main stack overflowed silently once printk got many floats (the board hung, no USB, the

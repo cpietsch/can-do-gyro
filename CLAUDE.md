@@ -15,7 +15,15 @@ README.md has the wiring, behavior, commands, settings and lessons learned: keep
   Gyro noise grows with the data rate: ~0.8 dps RMS at 104 Hz, ~3.7 at 416, ~8 at 833. The gyro offset differs by
   ~3 dps with the RollerCAN powered or not and wanders ~1 dps with temperature. IMU heater: PWM on PA8 (TIM1_CH1,
   alias imu-heater), held at 40 °C by PI on the IMU's temperature (0x20), gains and limits (60% max) from Seeed's
-  zephyr-imu-temp-pid-6axis example; the gyro is calibrated after warm-up. `t` toggles it for comparisons.
+  zephyr-imu-temp-pid-6axis example, but the integral cap raised to 300 (Seeed's 180 got stuck at ~36 °C in open air);
+  the gyro is calibrated after warm-up. The reading swings ±1 °C at 40, so "±0.5 for 10 s" rarely holds and it
+  calibrates via the 2 min fallback. `t` toggles it for comparisons.
+- Zephyr 4.4's CAN driver (can_mcan.c) jumped to address 0 on a TX event for an already completed buffer (after a
+  bus-off): fault in the CAN ISR every 2-4 min while holding (LED stopped, USB silent, motor kept its target).
+  patch_zephyr.py (PlatformIO pre-script) applies upstream's NULL check to framework-zephyr-nrf54lm20 (the board's
+  build.zephyr.package, not framework-zephyr), original kept as can_mcan.c.orig.
+- Crash record: fault handler / IWDG early warning (2 s) note pc, lr, loop stage, uptime in __noinit RAM and reboot;
+  `i` shows "last reset". The UF2 bootloader clears the reset flags (cause reads 0). `i` also counts CAN error states.
 - RollerCAN: STM32G431 + DRV8311, D3504 200 KV, 0.5 A continuous / 1 A short, 6–16 V. Protocol checked against its
   firmware (github.com/m5stack/M5Unit-RollerCAN-Internal-FW, can_protocol.c), see the comments in main.c. Position
   mode: degrees x100 multi-turn; its position PID turns the error straight into current (Kp 0x7023, only with the
@@ -44,7 +52,9 @@ sign is positive feedback and spins it.
 - The motor must not switch itself off: no turn limit, >90° off re-holds, stall retries after 3 s.
 
 Open: standalone (XIAO on the RollerCAN's Grove 5V, no USB) the gyro reads ~10x noisier at rest, still windows rarely
-match, the offset isn't corrected and the top slowly turns.
+match, the offset isn't corrected and the top slowly turns. After the CAN fix: 1 min holding without a crash and without
+any CAN error state (crashes had come after 10-30 s), longer run pending. Gyro noise at rest on USB with the heater on
+3.7/9.5/10.2 dps RMS (expected ~3.7 at 416 Hz): heater PWM suspected, compare with `t`.
 
 ## Conventions
 
