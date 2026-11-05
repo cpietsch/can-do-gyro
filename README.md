@@ -96,8 +96,9 @@ build.
 
 ## Using it
 
-1. Put it upright on the table, plug in the battery, and keep it still for 2 s: it measures the gyro's offset and the
-   motor axis. If it moves, it says so and tries again.
+1. Put it upright on the table and plug in the battery. It first warms the IMU to 40 °C (serial shows the
+   temperature; at most 2 minutes), then it wants to stand still for 2 s: it measures the gyro's offset and the motor
+   axis. If it moves, it says so and tries again.
 2. From then on it holds: the top keeps facing the direction it faced when holding started. Turn the bottom, pick it
    up, tilt it: the motor turns the top back.
 
@@ -114,7 +115,8 @@ answer, so a terminal that echoes the XIAO's own output back (Linux does until t
 | `p <mA/°>` | stiffness, 5 to 100, until reset |
 | `d <ms>` | damping, 0 to 500, until reset |
 | `f` | flip the motor direction until reset |
-| `i` | status: deviation, rotor, current, voltage, temperature, gyro offset, tilt, loop timing, battery, recording |
+| `t` | IMU heater off / on until reset (to compare) |
+| `i` | status: deviation, rotor, current, voltage, temperature, gyro offset and noise, standing-still windows, tilt, IMU temperature and heater, loop timing, battery, recording |
 | `dump` | print the recording (motor off meanwhile), see below |
 | `erase` | clear the recording; the next boot records |
 | `?` | list the commands |
@@ -138,6 +140,10 @@ answer, so a terminal that echoes the XIAO's own output back (Linux does until t
   turns the top back; capped at 300 mA.
 - **Standing still**: every 1/4 s with the gyro within 2.5 °/s of its offset counts as standing still. That time
   isn't integrated and the offset follows the gyro, so the direction doesn't drift at rest.
+- **IMU heater**: the gyro's offset wanders with temperature, so the IMU is kept at 40 °C by the heater resistors
+  around it: PI regulation on the IMU's own temperature sensor every 0.5 s, PWM on PA8, at most 60% duty (gains and
+  limits from Seeed's `zephyr-imu-temp-pid-6axis` example). The gyro is calibrated once the IMU has held 40 °C for
+  10 s. Above 50 °C or without a temperature reading the heater is off.
 - **Never gives up**: no turn limit (the RollerCAN counts ~59,000 turns), the top more than 90° off (held by hand)
   makes its current direction the new one, and after the RollerCAN's stall protection (blocked ~3 s) it holds again
   after 3 s. Only an empty battery switches the motor off.
@@ -153,6 +159,8 @@ Defaults in `src/main.c`, tuned by hand and from recordings, standalone on the b
 - **Gyro 416 Hz**: at 104 Hz its readings come ~15 ms late and the unit wobbled at ~17 Hz. 416 Hz is noisier
   (~3.7 °/s RMS) but held best.
 - **Loop ~1 ms** (`LOOP_US` 500 µs sleep; IMU 0.3 ms, CAN 0.1 ms).
+- **IMU at 40 °C** (`HEATER_TARGET_C`), as in Seeed's example: above room temperature, so the heater can always hold
+  it.
 - **Max current 500 mA** (`MAX_CURRENT_MA`): the motor's continuous rating without cooling, so it can even stay
   blocked. The RollerCAN's factory limit is 1000 mA.
 
@@ -209,8 +217,10 @@ Things learned along the way, in case they save you time:
 - **IMU block data update**: with BDU on, reading the accelerometer's registers alone left the FIFO's gyro samples
   ~6 °/s off on one axis. Off, the accelerometer can be read alone and less often.
 - **Gyro offset**: it changes by up to ~3 °/s depending on whether the motor's supply is on, and wanders with
-  temperature, so calibrate with everything powered as it will run. The board has a heater around the IMU for
-  temperature regulation; this project doesn't use it yet.
+  temperature, so calibrate with everything powered as it will run, and once the IMU is at its temperature.
+- **IMU heater**: resistors around the IMU, switched by PWM on PA8 (TIM1_CH1, board alias `imu-heater`, 1 kHz). The
+  IMU's die temperature is in its registers 0x20/0x21 (256 LSB per °C, 0 = 25 °C). Seeed's example
+  `zephyr-imu-temp-pid-6axis` shows the regulation.
 
 ## Known issues
 

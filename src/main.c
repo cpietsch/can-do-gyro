@@ -14,6 +14,7 @@
 #include <zephyr/drivers/flash.h>
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/i2c.h>
+#include <zephyr/drivers/pwm.h>
 #include <zephyr/drivers/uart.h>
 #include <zephyr/kernel.h>
 #include <zephyr/storage/flash_map.h>
@@ -130,6 +131,21 @@
 // The gyro's real sample period (its own clock, nominally 1/416 s), measured over this long. Each sample counts for
 // exactly that: splitting the loop's time among its samples biased the integration the same way as skipping them.
 #define SAMPLE_PERIOD_S 5.0f
+// IMU heater: resistors around the IMU, PWM on PA8 (TIM1_CH1, the board's imu-heater alias). The gyro offset wanders
+// with temperature, so the IMU is held at HEATER_TARGET_C: PI on the IMU's own temperature sensor every 0.5 s, with the
+// gains and limits of Seeed's example (zephyr-imu-temp-pid-6axis). The gyro is calibrated once it's there.
+#define IMU_OUT_TEMP_L 0x20         // int16, 256 LSB per degree C, 0 = 25 C
+#define HEATER_TARGET_C 40.0f
+#define HEATER_INTERVAL_MS 500
+#define HEATER_KP 0.025f            // duty per degree C
+#define HEATER_KI 0.002f            // duty per degree C x s
+#define HEATER_INTEGRAL_MAX 180.0f  // degree C x s
+#define HEATER_DUTY_MAX 0.6f
+#define HEATER_DUTY_STEP 0.05f      // per update
+#define HEATER_CUTOFF_C 50.0f       // above this, or without a reading: heater off
+#define HEATER_READY_C 0.5f         // calibrate once the IMU stayed within this of the target ...
+#define HEATER_READY_MS 10000       // ... for this long,
+#define HEATER_WAIT_MS 120000       // or after this long anyway
 
 // ---- 3D orientation ----
 // A quaternion from XIAO axes to room axes (room z = up), integrated from all three gyro axes; gravity (when the
@@ -178,6 +194,7 @@ static const struct device *const can = DEVICE_DT_GET(DT_CHOSEN(zephyr_canbus));
 static const struct device *const console = DEVICE_DT_GET(DT_CHOSEN(zephyr_console));
 static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(DT_ALIAS(led0), gpios);
 static const struct i2c_dt_spec imu = I2C_DT_SPEC_GET(DT_ALIAS(imu0));
+static const struct pwm_dt_spec heater = PWM_DT_SPEC_GET(DT_ALIAS(imu_heater));
 CAN_MSGQ_DEFINE(rx, 16);
 K_MSGQ_DEFINE(input, 1, 64, 1);  // typed characters
 
@@ -197,6 +214,11 @@ static bool imuOk = false;
 static bool calibrated = false;
 static float bias[3];  // gyro zero offset, dps
 static float up[3];    // unit vector, XIAO axes: up = the motor axis
+static bool heaterWanted = true;       // "t" switches it off and on until reset
+static float imuTemp = NAN;            // degrees C, smoothed; NAN = no reading
+static float heaterDuty = 0, heaterIntegral = 0;
+static int64_t heaterSince = 0;        // uptime when the heater was switched on (boot, "t")
+static int64_t heaterReadySince = -1;  // since when the IMU is within HEATER_READY_C of the target, -1 = it isn't
 typedef struct {
   float w, x, y, z;
 } Quat;
@@ -235,7 +257,8 @@ static uint32_t timingLoops = 0;
 static uint32_t timingMark, loopMark;
 static float loopAccel[3];  // the accelerometer as the loop last saw it
 static uint32_t tiltCorrected = 0, tiltSamples = 0;
-static double loopGyroSum[3];  // gyro samples minus the offset, summed
+static double loopGyroSum[3], loopGyroSq[3];  // gyro samples minus the offset, summed and squared (for "i")
+static uint32_t stillWindows = 0, allWindows = 0;  // 1/4 s windows that counted as standing still, all (for "i")
 static uint32_t fifoSkippedWords = 0, fifoResets = 0;  // since boot
 
 // Recording
@@ -432,6 +455,39 @@ static bool readVector(uint8_t reg, float scale, float v[3]) {
   return true;
 }
 
+// ---- IMU heater ----
+
+static void heaterSet(float duty) {
+  heaterDuty = duty;
+  if (pwm_is_ready_dt(&heater)) pwm_set_dt(&heater, heater.period, (uint32_t)(heater.period * duty));
+}
+
+// Every HEATER_INTERVAL_MS: read the IMU's temperature and set the heater
+static void heaterUpdate(int64_t now) {
+  uint8_t b[2];
+  if (!imuOk || i2c_burst_read_dt(&imu, IMU_OUT_TEMP_L, b, sizeof b)) {
+    imuTemp = NAN;
+  } else {
+    float t = (int16_t)sys_get_le16(b) / 256.0f + 25;
+    imuTemp = isnan(imuTemp) ? t : imuTemp + (t - imuTemp) * 0.25f;
+  }
+  if (!heaterWanted || isnan(imuTemp) || imuTemp > HEATER_CUTOFF_C) {
+    heaterIntegral = 0;
+    heaterSet(0);
+    heaterReadySince = -1;
+    return;
+  }
+  float error = HEATER_TARGET_C - imuTemp;
+  heaterIntegral = CLAMP(heaterIntegral + error * (HEATER_INTERVAL_MS / 1000.0f), -HEATER_INTEGRAL_MAX,
+                         HEATER_INTEGRAL_MAX);
+  float duty = CLAMP(HEATER_KP * error + HEATER_KI * heaterIntegral, 0.0f, HEATER_DUTY_MAX);
+  heaterSet(CLAMP(duty, heaterDuty - HEATER_DUTY_STEP, heaterDuty + HEATER_DUTY_STEP));
+  if (fabsf(error) > HEATER_READY_C) heaterReadySince = -1;
+  else if (heaterReadySince < 0) heaterReadySince = now;
+}
+
+static bool heaterReady(int64_t now) { return heaterReadySince >= 0 && now - heaterReadySince >= HEATER_READY_MS; }
+
 // ---- Orientation ----
 
 static void cross(const float a[3], const float b[3], float out[3]) {
@@ -479,6 +535,7 @@ static double attitudeUpdate(const float g[3], const float a[3], float dt) {
   for (int i = 0; i < 3; i++) {
     w[i] = g[i] / DEG;
     loopGyroSum[i] += (double)g[i];
+    loopGyroSq[i] += (double)(g[i] * g[i]);
   }
   memcpy(loopAccel, a, sizeof loopAccel);
   tiltSamples++;
@@ -805,12 +862,24 @@ static void status(void) {
   if (tiltSamples) {
     float an = sqrtf(dot(loopAccel, loopAccel));
     float c = an > 0 ? dot(loopAccel, up) / an : 1;
+    double mean[3], sd[3];
+    for (int i = 0; i < 3; i++) {
+      mean[i] = loopGyroSum[i] / tiltSamples;
+      sd[i] = sqrt(MAX(loopGyroSq[i] / tiltSamples - mean[i] * mean[i], 0));
+    }
     printk("IMU: tilt from the accelerometer %.1f deg (estimate %.1f), tilt corrected in %u of %u samples, gyro minus "
-           "offset %.2f %.2f %.2f dps\n", (double)(acosf(CLAMP(c, -1.0f, 1.0f)) * DEG), (double)tilt, tiltCorrected,
-           tiltSamples, loopGyroSum[0] / tiltSamples, loopGyroSum[1] / tiltSamples, loopGyroSum[2] / tiltSamples);
+           "offset %.2f %.2f %.2f dps, noise %.1f %.1f %.1f dps RMS, still in %u of %u 1/4 s windows\n",
+           (double)(acosf(CLAMP(c, -1.0f, 1.0f)) * DEG), (double)tilt, tiltCorrected, tiltSamples, mean[0], mean[1],
+           mean[2], sd[0], sd[1], sd[2], stillWindows, allWindows);
     memset(loopGyroSum, 0, sizeof loopGyroSum);
-    tiltCorrected = tiltSamples = 0;
+    memset(loopGyroSq, 0, sizeof loopGyroSq);
+    tiltCorrected = tiltSamples = stillWindows = allWindows = 0;
   }
+  if (isnan(imuTemp))
+    printk("IMU temperature: no reading, heater off\n");
+  else
+    printk("IMU %.1f C (target %.0f C), heater %.0f%%%s\n", (double)imuTemp, (double)HEATER_TARGET_C,
+           (double)(heaterDuty * 100), heaterWanted ? "" : ", off: t switches it on");
   if (timingLoops) {
     double us = 1e6 / sys_clock_hw_cycles_per_sec() / timingLoops;
     printk("loop %.0f us while holding: IMU %.0f, CAN read %.0f, CAN write %.0f, sleep %.0f, rest %.0f; FIFO since boot: "
@@ -875,11 +944,15 @@ static void handleCommand(const char *line) {
     direction = -direction;
     printk("direction %d\n", direction);
     if (holding) hold();
+  } else if (line[0] == 't') {
+    heaterWanted = !heaterWanted;
+    if (heaterWanted) heaterSince = k_uptime_get();
+    printk("IMU heater %s\n", heaterWanted ? "on" : "off");
   } else if (line[0] == 'i') {
     status();
   } else if (line[0] == '?') {
     printk("commands: h = hold the orientation, s = motor off, c = calibrate the gyro (keep still), "
-           "f = flip direction, p <mA/deg> = stiffness, d <ms> = damping, i = status, "
+           "f = flip direction, p <mA/deg> = stiffness, d <ms> = damping, t = IMU heater off/on, i = status, "
            "dump = print the recording, erase = clear it (the next boot records)\n");
   }
 }
@@ -909,10 +982,12 @@ int main(void) {
   }
   findRoller();
   imuOk = imuInit();
+  heaterSince = k_uptime_get();
   logInit();
   handleCommand("?");  // print the commands
 
   int64_t lastTry = k_uptime_get(), lastBlink = 0, windowStart = 0, quietUntil = 0, lastBattery = 0;
+  int64_t lastHeater = 0, lastWarmup = 0;
   lastCycles = k_cycle_get_32();
   double windowTurned = 0;
   float windowSum[3] = {0};
@@ -933,11 +1008,25 @@ int main(void) {
       if (!found) findRoller();
       if (!imuOk) imuOk = imuInit();
     }
+    if (now - lastHeater >= HEATER_INTERVAL_MS) {
+      lastHeater = now;
+      heaterUpdate(now);
+    }
+    // Calibrate once the IMU is at its temperature: the offset depends on it
     if (imuOk && !calibrated) {
-      if (holding) motorOff();
-      calibrate();
-      lastCycles = k_cycle_get_32();
-      imuFifoReset();
+      if (!heaterWanted || heaterReady(now) || now - heaterSince >= HEATER_WAIT_MS) {
+        if (heaterWanted && !heaterReady(now))
+          printk("IMU at %.1f C, not %.0f C after %d s: calibrating anyway\n", (double)imuTemp,
+                 (double)HEATER_TARGET_C, HEATER_WAIT_MS / 1000);
+        if (holding) motorOff();
+        calibrate();
+        lastCycles = k_cycle_get_32();
+        imuFifoReset();
+      } else if (now - lastWarmup >= 5000) {
+        lastWarmup = now;
+        printk("IMU warming up: %.1f C, heater %.0f%%; calibrates at %.0f C\n", (double)imuTemp,
+               (double)(heaterDuty * 100), (double)HEATER_TARGET_C);
+      }
     }
 
     // Track the orientation; turned = how far front and target turned apart. A STILL_MS window in which it stood still
@@ -993,7 +1082,9 @@ int main(void) {
         if (now - windowStart >= STILL_MS && windowN) {
           bool still = true;
           for (int i = 0; i < 3; i++) still = still && fabsf(windowSum[i] / windowN - bias[i]) <= STILL_DPS;
+          allWindows++;
           if (still) {
+            stillWindows++;
             logFlags |= LOG_STILL;
             turned -= windowTurned;
             for (int i = 0; i < 3; i++) bias[i] += (windowSum[i] / windowN - bias[i]) * OFFSET_FOLLOW;

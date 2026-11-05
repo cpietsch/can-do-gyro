@@ -13,7 +13,9 @@ README.md has the wiring, behavior, commands, settings and lessons learned: keep
   1 Mbit/s, extended IDs: the RollerCAN's firmware only accepts and sends classic 8-byte frames.
 - IMU: LSM6DS3TR-C on I2C2 (0x6A, alias imu0, 400 kHz in app.overlay), raw registers, no Zephyr sensor driver.
   Gyro noise grows with the data rate: ~0.8 dps RMS at 104 Hz, ~3.7 at 416, ~8 at 833. The gyro offset differs by
-  ~3 dps with the RollerCAN powered or not and wanders ~1 dps with temperature.
+  ~3 dps with the RollerCAN powered or not and wanders ~1 dps with temperature. IMU heater: PWM on PA8 (TIM1_CH1,
+  alias imu-heater), held at 40 °C by PI on the IMU's temperature (0x20), gains and limits (60% max) from Seeed's
+  zephyr-imu-temp-pid-6axis example; the gyro is calibrated after warm-up. `t` toggles it for comparisons.
 - RollerCAN: STM32G431 + DRV8311, D3504 200 KV, 0.5 A continuous / 1 A short, 6–16 V. Protocol checked against its
   firmware (github.com/m5stack/M5Unit-RollerCAN-Internal-FW, can_protocol.c), see the comments in main.c. Position
   mode: degrees x100 multi-turn; its position PID turns the error straight into current (Kp 0x7023, only with the
