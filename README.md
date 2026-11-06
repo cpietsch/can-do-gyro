@@ -40,7 +40,7 @@ Everything this needs is on the thumb-sized board, so the whole controller is th
 - **On-board 6-axis IMU** (LSM6DS3TR-C, I2C): gyro at 416 Hz through its FIFO, every sample used.
 - **Cortex-M33 at 144 MHz with FPU**: a quaternion update per gyro sample, the control law and CAN traffic every loop
   leave most of the time asleep (the loop takes ~0.5 ms of work).
-- **1 MB dual-bank flash**: the firmware runs from bank 1 and records ~30 s of telemetry into bank 2 while it runs,
+- **1 MB dual-bank flash**: the firmware runs from bank 1 and records ~90 s of telemetry into bank 2 while it runs,
   without stalling, so you can see afterwards what it did standalone on the battery.
 - **Native USB**: serial console for commands and status, and drag-and-drop UF2 flashing.
 
@@ -119,7 +119,7 @@ answer, so a terminal that echoes the XIAO's own output back (Linux does until t
 | `t` | IMU heater off / on until reset (to compare) |
 | `i` | status: deviation, rotor, current, voltage, temperature, gyro offset and noise, standing-still windows, tilt, IMU temperature and heater, loop timing, last reset (crash record), CAN errors, battery, recording |
 | `dump` | print the recording (motor off meanwhile), see below |
-| `erase` | clear the recording; the next boot records |
+| `erase` | clear the recording; it records from the next hold |
 | `?` | list the commands |
 
 ## How it works
@@ -172,12 +172,14 @@ Defaults in `src/main.c`, tuned by hand and from recordings, standalone on the b
 
 ## Recording
 
-To see what it does standalone, without USB. From boot, every loop writes the time, the top's turning rate and
-deviation, the rotor position, the motor current, the tilt and flags to the XIAO's flash (the unused OTA slot in bank
-2, 480 KB: ~30 s, then it stops). A recording survives resets, power off and reflashing; a boot only records when
-there is none.
+To see what it does standalone, without USB. From the first hold on (not during warm-up and calibration), every loop
+writes the time, the top's turning rate and deviation, the rotor position, the motor current, the tilt and flags to the
+XIAO's flash (every 3rd loop, ~3 ms apart, flags of the loops in between merged in; the unused OTA slot in bank 2,
+480 KB: ~90 s, then it stops). A recording survives resets, power off
+and reflashing; it only records when the area is empty. After `erase` it records from the next hold: right away if the
+battery is on (`erase` switches the motor off, it holds again by itself).
 
-1. `erase` over USB, unplug USB.
+1. `erase` over USB with the battery unplugged, unplug USB.
 2. Power it up on the battery and let it run.
 3. Unplug the battery (the XIAO powers off, the recording stays), plug in USB.
 4. `python log.py rec.csv` (needs pyserial, PlatformIO's Zephyr Python has it:

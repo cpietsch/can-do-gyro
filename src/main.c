@@ -167,9 +167,11 @@
 
 // ---- Recording ----
 // To see what it does standalone, without USB: from boot, every loop writes a LogRecord to the XIAO's internal flash,
-// in the OTA slot (480 KB in flash bank 2: the code runs from bank 1, so writing doesn't stall it): ~30 s at the 1 ms
-// loop. Kept until "erase" (reset, power off and reflashing don't touch it); a boot records only when it's empty.
+// in the OTA slot (480 KB in flash bank 2: the code runs from bank 1, so writing doesn't stall it): ~90 s at every 3rd
+// loop (LOG_EVERY), from the first hold. Kept until "erase" (reset, power off and reflashing don't touch it); it records
+// only when it's empty.
 // "dump" prints it, log.py turns that into a CSV.
+#define LOG_EVERY 3  // record every 3rd loop (~3 ms, ~90 s); the flags of the loops in between are merged in
 #define LOG_ERASE_BLOCK DT_PROP(DT_CHOSEN(zephyr_flash), erase_block_size)
 #define LOG_MAGIC 0x474F4C52  // "RLOG"
 #define LOG_VERSION 2
@@ -270,6 +272,7 @@ static uint32_t fifoSkippedWords = 0, fifoResets = 0;  // since boot
 // Recording
 static const struct flash_area *logArea;
 static uint32_t logOffset = 0;  // next record while recording, 0 = not recording
+static bool logArmed = false;   // the area is empty: record from the next hold (warm-up and calibration aren't worth it)
 static uint32_t logRecords = 0;
 static uint32_t logUs = 0;
 
@@ -798,6 +801,8 @@ static void checkBattery(int64_t now) {
 // ---- Holding ----
 
 // Keep the top's current orientation: from now on the motor turns it back whenever it's off
+static void logStart(void);
+
 static void hold(void) {
   int32_t actual;
   if (!readParam(P_ACTUAL_POSITION, &actual)) return;
@@ -813,6 +818,10 @@ static void hold(void) {
   pipeAnsweredAt = k_uptime_get();
   holding = true;
   printk("holding: the top keeps its orientation\n");
+  if (logArmed && logArea) {
+    logArmed = false;
+    logStart();
+  }
 }
 
 // ---- Recording ----
@@ -854,7 +863,7 @@ static bool logErase(void) {
   return true;
 }
 
-// At boot: record if the area is empty (or holds something else), keep a recording otherwise
+// At boot: record from the first hold if the area is empty (or holds something else), keep a recording otherwise
 static void logInit(void) {
   if (flash_area_open(PARTITION_ID(slot1_partition), &logArea)) {
     printk("recording: no flash area\n");
@@ -863,7 +872,8 @@ static void logInit(void) {
   }
   LogHeader h;
   if (logEmpty(0)) {
-    logStart();
+    logArmed = true;
+    printk("recording: empty, records from the first hold\n");
   } else if (!flash_area_read(logArea, 0, &h, sizeof h) && h.magic == LOG_MAGIC && h.version == LOG_VERSION) {
     while (sizeof h + (logRecords + 1) * sizeof(LogRecord) <= logArea->fa_size &&
            !logEmpty(sizeof h + logRecords * sizeof(LogRecord)))
@@ -871,15 +881,21 @@ static void logInit(void) {
     LogRecord last = {0};
     if (logRecords) flash_area_read(logArea, sizeof h + (logRecords - 1) * sizeof last, &last, sizeof last);
     logUs = last.us;
-    printk("recording: %u records (%.1f s) kept, not recording. dump prints them, erase clears (the next boot "
-           "records)\n", logRecords, logUs / 1e6);
+    printk("recording: %u records (%.1f s) kept, not recording. dump prints them, erase clears (records from the "
+           "next hold)\n", logRecords, logUs / 1e6);
   } else if (logErase()) {
-    logStart();
+    logArmed = true;
   }
 }
 
 static void logWrite(uint8_t flags) {
+  static uint8_t merged = 0;
+  static uint32_t loops = 0;
   if (!logOffset) return;
+  merged |= flags;
+  if (++loops % LOG_EVERY) return;
+  flags = merged;
+  merged = 0;
   LogRecord r = {
       .us = logUs,
       .rate = CLAMP(lroundf(rate * 10), INT16_MIN, INT16_MAX),
@@ -1000,6 +1016,7 @@ static void status(void) {
          canRxErr);
   if (faults) printk("faults: 0x%x (1 overvoltage, 2 stall, 4 out of range)\n", faults);
   if (logOffset) printk("recording: %u records (%.1f s)\n", logRecords, logUs / 1e6);
+  else if (logArmed) printk("recording: empty, records from the next hold\n");
   else if (logArea) printk("recording: %u records kept, not recording (dump, erase)\n", logRecords);
   if (batteryV > 0)
     printk("battery %.2f V averaged, ~%d%% of a %dS LiHV%s\n", (double)batteryV,
@@ -1017,7 +1034,10 @@ static void handleCommand(const char *line) {
   }
   if (!strcmp(line, "erase")) {
     motorOff();
-    if (logErase()) printk("recording: cleared, the next boot records\n");
+    if (logErase()) {
+      logArmed = true;
+      printk("recording: cleared, records from the next hold\n");
+    }
     lastCycles = k_cycle_get_32();
     return;
   }
@@ -1061,7 +1081,7 @@ static void handleCommand(const char *line) {
   } else if (line[0] == '?') {
     printk("commands: h = hold the orientation, s = motor off, c = calibrate the gyro (keep still), "
            "f = flip direction, p <mA/deg> = stiffness, d <ms> = damping, t = IMU heater off/on, i = status, "
-           "dump = print the recording, erase = clear it (the next boot records)\n");
+           "dump = print the recording, erase = clear it (records from the next hold)\n");
   }
 }
 

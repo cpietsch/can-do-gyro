@@ -52,9 +52,12 @@ sign is positive feedback and spins it.
 - The motor must not switch itself off: no turn limit, >90° off re-holds, stall retries after 3 s.
 
 Open: standalone (XIAO on the RollerCAN's Grove 5V, no USB) the gyro reads ~10x noisier at rest, still windows rarely
-match, the offset isn't corrected and the top slowly turns. After the CAN fix: 1 min holding without a crash and without
-any CAN error state (crashes had come after 10-30 s), longer run pending. Gyro noise at rest on USB with the heater on
-3.7/9.5/10.2 dps RMS (expected ~3.7 at 416 Hz): heater PWM suspected, compare with `t`.
+match, the offset isn't corrected and the top slowly turns. After the CAN fix: 7 min holding (6 handled) without a crash or
+any CAN error state (crashes had come after 10-30 s). Gyro noise at rest while holding 3.7/8.7/10.8 dps RMS, motor off
+1.8/3.2/2.7, heater on or off the same: the motor's holding jitter, mostly about the motor axis (z).
+Open: put back on the table after handling, the bottom turned a bit by itself (integral wound up in the air, where
+the bottom turns without resistance?). Recording now starts at the first hold (or after erase at the next), every
+3rd loop, ~90 s.
 
 ## Conventions
 
