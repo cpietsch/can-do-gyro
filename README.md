@@ -97,11 +97,13 @@ framework package in `~/.platformio` once and keeps the original as `can_mcan.c.
 
 ## Using it
 
-1. Put it upright on the table and plug in the battery. It first warms the IMU to 40 °C (serial shows the
-   temperature; at most 2 minutes), then it wants to stand still for 2 s: it measures the gyro's offset and the motor
-   axis. If it moves, it says so and tries again.
+1. Put it upright on the table and plug in the battery. It wants to stand still for 2 s: it measures the gyro's offset
+   and the motor axis. If it moves, it says so and tries again. The heater warms the IMU meanwhile.
 2. From then on it holds: the top keeps facing the direction it faced when holding started. Turn the bottom, pick it
    up, tilt it: the motor turns the top back.
+3. Held by the top in the air, the bottom hangs free and the motor would spin it up: once the rotor turns more than
+   180° within 0.2 s the motor switches off. Put it down: after 2 s standing still it holds the direction it faces
+   then.
 
 The green LED blinks once a second while all is well, and fast while the RollerCAN or the IMU is missing.
 
@@ -144,15 +146,20 @@ answer, so a terminal that echoes the XIAO's own output back (Linux does until t
 - **IMU heater**: the gyro's offset wanders with temperature, so the IMU is kept at 40 °C by the heater resistors
   around it: PI regulation on the IMU's own temperature sensor every 0.5 s, PWM on PA8, at most 60% duty (gains and
   limits from Seeed's `zephyr-imu-temp-pid-6axis` example, but the integral may use the whole 60%: with Seeed's cap
-  it got stuck at ~36 °C in open air). The gyro is calibrated once the IMU has held 40 °C ±0.5 for 10 s, or after
-  2 minutes at the latest. Above 50 °C or without a temperature reading the heater is off.
+  it got stuck at ~36 °C in open air). The gyro is calibrated right after power-on, while the IMU warms up: on the
+  way to 40 °C the offset shifts ~1 °/s, slowly enough for the standing-still correction to follow it (waiting for
+  40 °C first took up to 2 minutes). Above 50 °C or without a temperature reading the heater is off.
 - **Crash record**: a CPU fault reboots the board, and a watchdog reboots it when the loop stops for 2 s. Before that,
   the fault handler (or the watchdog's early warning interrupt) notes the address, the loop stage and the uptime in
   RAM that survives the reset; `i` shows it as "last reset". Look the address up with
   `arm-none-eabi-addr2line -f -e .pio/build/xiao/firmware.elf <pc> <lr>`.
 - **Never gives up**: no turn limit (the RollerCAN counts ~59,000 turns), the top more than 90° off (held by hand)
   makes its current direction the new one, and after the RollerCAN's stall protection (blocked ~3 s) it holds again
-  after 3 s. Only an empty battery switches the motor off.
+  after 3 s. Only an empty battery and a free-spinning bottom switch the motor off.
+- **Free spin**: held by the top, the bottom has nothing to push against, and the motor spun it up to thousands of
+  °/s. The rotor turning more than 180° within 0.2 s switches the motor off (normal use: at most 132°; free spins and
+  runaways 670–1190°); after 2 s standing still (tilt under 10°) it holds again, facing where it faces then. A rotor
+  speed above 1000 °/s for 0.2 s was tried first: the speed dipped below now and then and it cut off only after 1 s.
 
 ## Settings
 
@@ -172,7 +179,7 @@ Defaults in `src/main.c`, tuned by hand and from recordings, standalone on the b
 
 ## Recording
 
-To see what it does standalone, without USB. From the first hold on (not during warm-up and calibration), every loop
+To see what it does standalone, without USB. From the first hold on (not during calibration), every loop
 writes the time, the top's turning rate and deviation, the rotor position, the motor current, the tilt and flags to the
 XIAO's flash (every 3rd loop, ~3 ms apart, flags of the loops in between merged in; the unused OTA slot in bank 2,
 480 KB: ~90 s, then it stops). A recording survives resets, power off
@@ -229,7 +236,7 @@ Things learned along the way, in case they save you time:
 - **IMU block data update**: with BDU on, reading the accelerometer's registers alone left the FIFO's gyro samples
   ~6 °/s off on one axis. Off, the accelerometer can be read alone and less often.
 - **Gyro offset**: it changes by up to ~3 °/s depending on whether the motor's supply is on, and wanders with
-  temperature, so calibrate with everything powered as it will run, and once the IMU is at its temperature.
+  temperature, so calibrate with everything powered as it will run, and let the standing-still correction follow the offset while the IMU warms up.
 - **IMU heater**: resistors around the IMU, switched by PWM on PA8 (TIM1_CH1, board alias `imu-heater`, 1 kHz). The
   IMU's die temperature is in its registers 0x20/0x21 (256 LSB per °C, 0 = 25 °C). Seeed's example
   `zephyr-imu-temp-pid-6axis` shows the regulation.

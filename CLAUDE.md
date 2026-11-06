@@ -16,8 +16,8 @@ README.md has the wiring, behavior, commands, settings and lessons learned: keep
   ~3 dps with the RollerCAN powered or not and wanders ~1 dps with temperature. IMU heater: PWM on PA8 (TIM1_CH1,
   alias imu-heater), held at 40 °C by PI on the IMU's temperature (0x20), gains and limits (60% max) from Seeed's
   zephyr-imu-temp-pid-6axis example, but the integral cap raised to 300 (Seeed's 180 got stuck at ~36 °C in open air);
-  the gyro is calibrated after warm-up. The reading swings ±1 °C at 40, so "±0.5 for 10 s" rarely holds and it
-  calibrates via the 2 min fallback. `t` toggles it for comparisons.
+  the reading swings ±1 °C at 40. The gyro is calibrated right at power-on (waiting for 40 °C took up to 2 min, too
+  long): the offset shifts ~1 dps on the way, the still windows follow it. `t` toggles the heater for comparisons.
 - Zephyr 4.4's CAN driver (can_mcan.c) jumped to address 0 on a TX event for an already completed buffer (after a
   bus-off): fault in the CAN ISR every 2-4 min while holding (LED stopped, USB silent, motor kept its target).
   patch_zephyr.py (PlatformIO pre-script) applies upstream's NULL check to framework-zephyr-nrf54lm20 (the board's
@@ -49,7 +49,12 @@ sign is positive feedback and spins it.
   gyro samples). Still threshold 2.5 dps (1 dps never matched once the offset wandered).
 - Loop 1 ms with CAN pipelined (no waiting for answers). Shorter sleeps made the tilt estimate go wrong and the motor
   run off: open.
-- The motor must not switch itself off: no turn limit, >90° off re-holds, stall retries after 3 s.
+- The motor must not switch itself off: no turn limit, >90° off re-holds, stall retries after 3 s. Exception, free
+  spin: held by the top in the air the bottom hangs free and the motor spun it up (1800-6700 °/s). Rotor >180° within
+  0.2 s (normal use max 132°, spins 670-1190°) -> motor off, re-holds after 2 s still with tilt <10°. Speed >1000 °/s
+  for 200 ms cut off only after 1 s (dips below). A hand holding the top still for 1 s passed as standing still.
+  Test 2026-11-06: a fast spin cut off after 0.1 s, re-hold after put-down OK. Open: a slow free spin (500-800 °/s,
+  top held ~7° off) ran ~1000° over 2 s before the cutoff: it stays under 180°/0.2 s.
 
 Open: standalone (XIAO on the RollerCAN's Grove 5V, no USB) the gyro reads ~10x noisier at rest, still windows rarely
 match, the offset isn't corrected and the top slowly turns. After the CAN fix: 7 min holding (6 handled) without a crash or

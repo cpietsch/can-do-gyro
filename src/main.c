@@ -60,6 +60,16 @@
 #define STILL_DPS 2.5f
 #define STILL_MS 250
 #define OFFSET_FOLLOW 0.05f  // while standing still the offset follows the gyro (time constant ~5 s)
+// Free spin: the rotor turning more than SPIN_DEG within SPIN_STEPS steps of SPIN_SPEED_MS (~0.2 s) means the bottom
+// hangs free (lifted by the top, or a runaway): the motor has nothing to push against and spins it up. Motor off until
+// it stood still for SETTLE_WINDOWS 1/4 s windows (counted from the cutoff) with less than SETTLE_TILT_DEG tilt, then it
+// holds the direction it faces then. Recordings 2026-11-06: normal use at most 132 deg in 0.2 s, free spins and
+// runaways 670-1190. Speed above 1000 deg/s for 0.2 s (tried first) cut off a free spin only after 1 s: it dipped below.
+#define SPIN_DEG 180
+#define SPIN_STEPS 10
+#define SPIN_SPEED_MS 20
+#define SETTLE_WINDOWS 8
+#define SETTLE_TILT_DEG 10
 #define INPUT_QUIET_MS 300   // input ignored after a terminal connects, see main()
 
 // Battery: a 2S LiHV (7.6 V nominal, 4.35 V/cell full) on the RollerCAN's XT30, measured by the RollerCAN. For a normal
@@ -148,9 +158,6 @@
 #define HEATER_DUTY_MAX 0.6f
 #define HEATER_DUTY_STEP 0.05f      // per update
 #define HEATER_CUTOFF_C 50.0f       // above this, or without a reading: heater off
-#define HEATER_READY_C 0.5f         // calibrate once the IMU stayed within this of the target ...
-#define HEATER_READY_MS 10000       // ... for this long,
-#define HEATER_WAIT_MS 120000       // or after this long anyway
 
 // ---- 3D orientation ----
 // A quaternion from XIAO axes to room axes (room z = up), integrated from all three gyro axes; gravity (when the
@@ -225,8 +232,6 @@ static float up[3];    // unit vector, XIAO axes: up = the motor axis
 static bool heaterWanted = true;       // "t" switches it off and on until reset
 static float imuTemp = NAN;            // degrees C, smoothed; NAN = no reading
 static float heaterDuty = 0, heaterIntegral = 0;
-static int64_t heaterSince = 0;        // uptime when the heater was switched on (boot, "t")
-static int64_t heaterReadySince = -1;  // since when the IMU is within HEATER_READY_C of the target, -1 = it isn't
 typedef struct {
   float w, x, y, z;
 } Quat;
@@ -257,6 +262,14 @@ static int32_t pipeActual;      // the last position answer, degrees x100
 static bool pipeFresh = false;  // ... not used for a target yet
 static bool pipePending = false;  // a position request is out
 static int64_t pipeSentAt = 0, pipeAnsweredAt = 0;
+static int32_t speedFrom = 0;          // rotor position (degrees x100) and cycle count where the speed measurement began
+static uint32_t speedFromCycles = 0;
+static bool speedValid = false;
+static float rotorSpeed = 0;           // degrees per second, while holding
+static int32_t spinSteps[SPIN_STEPS];  // the rotor's travel in the last steps (degrees x100), ring
+static int spinStep = 0;
+static int32_t spinTravel = 0;         // their sum
+static bool lifted = false;            // free spin detected: motor off until it stands still again
 
 // Diagnostics for "i", since the last "i"
 enum { T_IMU, T_READ, T_WRITE, T_SLEEP, T_LOOP, T_N };  // where a holding loop's time goes, cycles
@@ -454,6 +467,21 @@ static void drainAnswers(void) {
     if (f.dlc != 8) continue;
     if (frameType(&f) == TYPE_READ && (f.id & 0xFF) == ROLLER_ID && sys_get_le16(f.data) == P_ACTUAL_POSITION) {
       pipeActual = (int32_t)sys_get_le32(f.data + 4);
+      uint32_t c = k_cycle_get_32();
+      float s = (float)(c - speedFromCycles) / sys_clock_hw_cycles_per_sec();
+      if (!speedValid) {
+        speedFrom = pipeActual;
+        speedFromCycles = c;
+        speedValid = true;
+      } else if (s >= SPIN_SPEED_MS / 1000.0f) {
+        int32_t d = pipeActual - speedFrom;
+        rotorSpeed = d / 100.0f / s;
+        spinTravel += d - spinSteps[spinStep];
+        spinSteps[spinStep] = d;
+        spinStep = (spinStep + 1) % SPIN_STEPS;
+        speedFrom = pipeActual;
+        speedFromCycles = c;
+      }
       pipeFresh = true;
       pipePending = false;
       pipeAnsweredAt = k_uptime_get();
@@ -574,7 +602,6 @@ static void heaterUpdate(int64_t now) {
   if (!heaterWanted || isnan(imuTemp) || imuTemp > HEATER_CUTOFF_C) {
     heaterIntegral = 0;
     heaterSet(0);
-    heaterReadySince = -1;
     return;
   }
   float error = HEATER_TARGET_C - imuTemp;
@@ -582,11 +609,8 @@ static void heaterUpdate(int64_t now) {
                          HEATER_INTEGRAL_MAX);
   float duty = CLAMP(HEATER_KP * error + HEATER_KI * heaterIntegral, 0.0f, HEATER_DUTY_MAX);
   heaterSet(CLAMP(duty, heaterDuty - HEATER_DUTY_STEP, heaterDuty + HEATER_DUTY_STEP));
-  if (fabsf(error) > HEATER_READY_C) heaterReadySince = -1;
-  else if (heaterReadySince < 0) heaterReadySince = now;
 }
 
-static bool heaterReady(int64_t now) { return heaterReadySince >= 0 && now - heaterReadySince >= HEATER_READY_MS; }
 
 // ---- Orientation ----
 
@@ -813,6 +837,10 @@ static void hold(void) {
   if (!writeParam(P_POSITION, actual) || !writeParam(P_OUTPUT, 1)) return;
   turned = 0;
   integral = 0;
+  speedValid = false;
+  rotorSpeed = 0;
+  memset(spinSteps, 0, sizeof(spinSteps));
+  spinTravel = 0;
   facingReset();
   pipeFresh = pipePending = false;
   pipeAnsweredAt = k_uptime_get();
@@ -847,7 +875,7 @@ static void logStart(void) {
   logUs = 0;
   printk("recording: started (%u records, ~%u s, kept until erase)\n",
          (unsigned)((logArea->fa_size - sizeof h) / sizeof(LogRecord)),
-         (unsigned)((logArea->fa_size - sizeof h) / sizeof(LogRecord) / 1000));
+         (unsigned)((logArea->fa_size - sizeof h) / sizeof(LogRecord) * LOG_EVERY / 1000));  // loop ~1 ms
 }
 
 static bool logErase(void) {
@@ -963,7 +991,10 @@ static void logDump(void) {
 
 static void status(void) {
   printk("%s, top %.1f deg off, direction %d, %.0f mA/deg, damping %.0f ms\n",
-         holding ? "holding" : "not holding (motor off)", turned, direction, (double)positionKp, (double)dampingMs);
+         holding  ? "holding"
+         : lifted ? "not holding (bottom spun freely: holds once it stands still)"
+                  : "not holding (motor off)",
+         turned, direction, (double)positionKp, (double)dampingMs);
   int32_t position = 0, current = 0, vin = 0, temp = 0;
   if (found && readParam(P_ACTUAL_POSITION, &position) && readParam(P_ACTUAL_CURRENT, &current) &&
       readParam(P_VIN, &vin) && readParam(P_TEMP, &temp)) {
@@ -1060,6 +1091,7 @@ static void handleCommand(const char *line) {
   } else if (line[0] == 'h') {
     if (battery == BATTERY_EMPTY) printk("battery empty: holds once it's charged\n");
     wantHold = true;
+    lifted = false;
     if (holding) hold();  // the orientation from now on
   } else if (line[0] == 's') {
     wantHold = false;
@@ -1074,7 +1106,6 @@ static void handleCommand(const char *line) {
     if (holding) hold();
   } else if (line[0] == 't') {
     heaterWanted = !heaterWanted;
-    if (heaterWanted) heaterSince = k_uptime_get();
     printk("IMU heater %s\n", heaterWanted ? "on" : "off");
   } else if (line[0] == 'i') {
     status();
@@ -1116,13 +1147,13 @@ int main(void) {
   can_set_state_change_callback(can, canStateChanged, NULL);
   findRoller();
   imuOk = imuInit();
-  heaterSince = k_uptime_get();
   logInit();
   watchdogStart();
   handleCommand("?");  // print the commands
 
   int64_t lastTry = k_uptime_get(), lastBlink = 0, windowStart = 0, quietUntil = 0, lastBattery = 0;
-  int64_t lastHeater = 0, lastWarmup = 0;
+  int64_t lastHeater = 0;
+  int stillRun = 0;  // consecutive still windows
   lastCycles = k_cycle_get_32();
   double windowTurned = 0;
   float windowSum[3] = {0};
@@ -1149,21 +1180,13 @@ int main(void) {
       lastHeater = now;
       heaterUpdate(now);
     }
-    // Calibrate once the IMU is at its temperature: the offset depends on it
+    // Calibrate right away, the heater warms the IMU meanwhile: the offset shifts ~1 dps on the way to 40 C, slowly
+    // enough for the standing-still windows to follow it (waiting for 40 C took 2 min)
     if (imuOk && !calibrated) {
-      if (!heaterWanted || heaterReady(now) || now - heaterSince >= HEATER_WAIT_MS) {
-        if (heaterWanted && !heaterReady(now))
-          printk("IMU at %.1f C, not %.0f C after %d s: calibrating anyway\n", (double)imuTemp,
-                 (double)HEATER_TARGET_C, HEATER_WAIT_MS / 1000);
-        if (holding) motorOff();
-        calibrate();
-        lastCycles = k_cycle_get_32();
-        imuFifoReset();
-      } else if (now - lastWarmup >= 5000) {
-        lastWarmup = now;
-        printk("IMU warming up: %.1f C, heater %.0f%%; calibrates at %.0f C\n", (double)imuTemp,
-               (double)(heaterDuty * 100), (double)HEATER_TARGET_C);
-      }
+      if (holding) motorOff();
+      calibrate();
+      lastCycles = k_cycle_get_32();
+      imuFifoReset();
     }
 
     // Track the orientation; turned = how far front and target turned apart. A STILL_MS window in which it stood still
@@ -1221,6 +1244,11 @@ int main(void) {
           bool still = true;
           for (int i = 0; i < 3; i++) still = still && fabsf(windowSum[i] / windowN - bias[i]) <= STILL_DPS;
           allWindows++;
+          stillRun = still ? stillRun + 1 : 0;
+          if (lifted && stillRun >= SETTLE_WINDOWS && tilt < SETTLE_TILT_DEG) {
+            lifted = false;
+            printk("standing still again: holds the direction it faces now\n");
+          }
           if (still) {
             stillWindows++;
             logFlags |= LOG_STILL;
@@ -1269,13 +1297,20 @@ int main(void) {
       lastBattery = now;
       checkBattery(now);
     }
-    if (wantHold && !holding && found && imuOk && calibrated && battery != BATTERY_EMPTY && now >= stallRetryAt)
+    if (wantHold && !holding && !lifted && found && imuOk && calibrated && battery != BATTERY_EMPTY &&
+        now >= stallRetryAt)
       hold();
 
     // Holding: the rotor's target is where it is now, minus how far the top is off, plus its turning rate times the
     // damping, plus the integral. The RollerCAN's position controller pushes with positionKp mA per degree of that.
     stage = STAGE_HOLD;
-    if (holding && fabs(turned) > RUNAWAY_DEG) {
+    if (holding && abs(spinTravel) > SPIN_DEG * 100) {
+      printk("the bottom spins freely (%d deg in 0.2 s, lifted by the top?): motor off until it stands still\n",
+             spinTravel / 100);
+      motorOff();
+      lifted = true;
+      stillRun = 0;
+    } else if (holding && fabs(turned) > RUNAWAY_DEG) {
       printk("the top got %.0f deg off (held?): its direction now counts as the new one\n", turned);
       hold();
     } else if (holding) {
